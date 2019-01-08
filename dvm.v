@@ -102,6 +102,19 @@ Module D (H:Herit).
          | Trefnull => Vrefnull (** Should never happen *)
          end).
 
+(** [new cldefs clid heap] vérifie que clid existe bien, puis retourne une
+    reference [r] un nouveau [Heap] [h] et telle que [heap(r) = None] et [h(r) =
+    Some(o)] où [o] est un objet "frais" et toutes les adresses de [heap] sont
+    identiques dans [h]. *)
+  Function new (clid:class_id) (heap:Heap) : option (DVal * Heap) :=
+    match Dico.find clid allcl with
+    | None => None (** Classe inconnue *)
+    | Some cldef =>
+      let flds:Obj := {| objclass := clid; objfields := build_flds cldef |} in
+      let newhpidx: nat := maxkey heap in
+      Some((Vref(clid,S newhpidx)), Dico.add (S newhpidx) flds heap)
+    end.
+
 (**
   Lemma new_one_change : forall clid hp hpidx newhp,
       new clid hp = Some (hpidx, newhp) ->
@@ -248,14 +261,75 @@ Module D (H:Herit).
              |}
 
       | Getfield cl namefld typ =>
-        None
+        match s.(frame).(stack) with
+        | Vref (classid,hpidx) :: stack' =>
+          if (H.sub classid cl) then
+          match Dico.find hpidx s.(heap) with
+          | None => None (** adresse inconnue *)
+          | Some {|objclass:= objcl; objfields:= flds |} => (* TODO: vérifier le type retourné? *)
+            if (H.sub objcl cl) then
+            match Dico.find namefld flds with
+            | None => None (** Champ de classe inconnu ou pas initialisé *)
+            | Some v =>
+              Some {| framestack := s.(framestack); heap := s.(heap);
+                      frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                                  pc:= pc+1;
+                                  stack:= v :: stack'
+                               |}
+                   |}
+            end
+            else None
+          end
+          else None
+        | _  => None (** Stack underflow *)
+        end
 
       | Putfield cl namefld typ =>
-        None
+        match s.(frame).(stack) with
+        | Vref (classid,hpidx) :: v :: stack' =>
+          if (H.sub classid cl) then
+          match FIND cl H.allcl with
+          | None => None
+          | Some (cldef) =>
+            match FIND namefld cldef with
+            | None => None
+            | Some (typfld) =>
+              let typv := D.v2t v in
+              if compat typv typfld then
+              match Dico.find hpidx s.(heap) with
+              | None => None (** adresse inconnue, objet non alloué *)
+              | Some {| objclass:= objcl; objfields:= flds |}=>
+                let newflds := {| objclass:= objcl;
+                                  objfields:=Dico.add namefld v flds |} in
+                let newheap := Dico.add hpidx newflds s.(heap) in
+                Some {| framestack := s.(framestack);
+                        heap := newheap;
+                        frame := {| mdef:=s.(frame).(mdef) ;
+                                    regs:= s.(frame).(regs);
+                                    pc:= pc+1;
+                                    stack:= stack'
+                                 |}
+                     |}
+              end
+              else None
+            end
+          end
+          else None
+        | _ => None (** Stack underflow *) 
+        end
 
       | New clid =>
-        None
+        match new clid s.(heap) with
+        | None => None (** Classe inconnue *)
+        | Some (newobj,newhp) =>
+          Some {| framestack := s.(framestack); heap := newhp;
+                  frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                              stack:= newobj :: s.(frame).(stack);
+                              pc:= pc+1
+                           |}
+               |}
 
+        end
       end
     end.
 
