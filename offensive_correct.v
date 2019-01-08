@@ -1,4 +1,3 @@
-
  
 Require Import OrderedType OrderedTypeEx OrderedTypeAlt DecidableType DecidableTypeEx.
 Require Import RelationClasses.
@@ -89,7 +88,20 @@ Module Offensive_correcte (H:heritage.Herit).
   Qed.
   Import D.
 
-  (** Diagramme de commutation entre D et O. *)
+  Axiom maxkey_off_ok: forall hp, maxkey (offensive_heap hp) = (maxkey hp).
+
+  Lemma new_ok:
+    forall clid (hp:D.Heap) x y x' y' z,
+      Some (x,y) = O.new clid (offensive_heap hp) ->
+      Some (z,x',y') = D.new clid hp ->
+      x = x' /\
+      Dico.Equal y
+                (Dico.map (fun obj : D.Obj =>
+                            {| O.objclass  := D.objclass obj;
+                               O.objfields := Dico.map d2o (D.objfields obj) |})
+                          y').
+
+  (** Diagramme de commutation entre D et O.*)
   Lemma offensive_ok : 
     forall (s s':D.State) (os os' os'':O.State),
       offensive_state s = os ->
@@ -195,7 +207,42 @@ Module Offensive_correcte (H:heritage.Herit).
       unfold offensive_state. simpl. reflexivity.
   + inversion H1. inversion H2. clear H1 H2.
      unfold offensive_state. simpl. reflexivity.
-  + inversion H1. inversion H2. rewrite H0. reflexivity.
+  + destruct_with_eqn (stack (frame s)); try now inversion H1.
+    destruct_with_eqn d; try now inversion H1.
+    destruct clrf.
+    case_eq (H.sub c cl);
+    intros; subst;
+    rewrite H in H1; try now inversion H1.
+    destruct_with_eqn (FIND h (heap s) ); try now inversion H1.
+    destruct_with_eqn o; try now inversion H1.
+    case_eq (H.sub objclass0 cl);
+    intros; subst;
+    rewrite H0 in H1; try now  inversion H1.
+    destruct_with_eqn (FIND fldrf objfields0); try now inversion H1. subst.
+    unfold offensive_state in H2. simpl in H2.
+    setoid_rewrite Heql in H2. simpl in H2. subst.
+    unfold offensive_heap in H2. simpl in H2.
+    rewrite Dicomore.F.map_o in H2.
+    rewrite Heqo in H2. simpl in H2.
+    rewrite Dicomore.F.map_o in H2.
+    unfold objfields in H2. inversion Heqo.
+    setoid_rewrite Heqo0 in H2. simpl in H2.
+    * inversion H1. inversion H2. clear H1 H2.
+      unfold offensive_state; simpl.
+      reflexivity.
+
+  + admit.
+  + destruct_with_eqn (new clid (heap s)); try now inversion H1.
+    destruct p.
+    unfold offensive_state in H2. simpl in H2.
+  
+    unfold offensive_heap in H2. simpl in H2.
+    
+    unfold O.new in H2.  
+    rewrite Dicomore.F.map_o in H2.
+    
+  + 
+   inversion H1. inversion H2. rewrite H0. reflexivity.
 Qed.
   
 

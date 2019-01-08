@@ -106,13 +106,13 @@ Module D (H:Herit).
     reference [r] un nouveau [Heap] [h] et telle que [heap(r) = None] et [h(r) =
     Some(o)] où [o] est un objet "frais" et toutes les adresses de [heap] sont
     identiques dans [h]. *)
-  Function new (clid:class_id) (heap:Heap) : option (DVal * Heap) :=
+  Function new (clid:class_id) (heap:Heap) :=
     match Dico.find clid allcl with
     | None => None (** Classe inconnue *)
     | Some cldef =>
       let flds:Obj := {| objclass := clid; objfields := build_flds cldef |} in
       let newhpidx: nat := maxkey heap in
-      Some((Vref(clid,S newhpidx)), Dico.add (S newhpidx) flds heap)
+      Some((clid,S newhpidx), Dico.add (S newhpidx) flds heap)
     end.
 
 (**
@@ -324,7 +324,7 @@ Module D (H:Herit).
         | Some (newobj,newhp) =>
           Some {| framestack := s.(framestack); heap := newhp;
                   frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
-                              stack:= newobj :: s.(frame).(stack);
+                              stack:= (Vref newobj) :: s.(frame).(stack);
                               pc:= pc+1
                            |}
                |}
@@ -393,5 +393,4 @@ Module D (H:Herit).
 
 
 End D.
-
 
