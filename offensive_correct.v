@@ -1,5 +1,5 @@
 
-
+ 
 Require Import OrderedType OrderedTypeEx OrderedTypeAlt DecidableType DecidableTypeEx.
 Require Import RelationClasses.
 From bcv Require Import vmtype dvm ovm.
@@ -115,7 +115,7 @@ Module Offensive_correcte (H:heritage.Herit).
       destruct d eqn:heq_1;try now inversion H1.
       destruct l eqn:heq_2;try now inversion H1.
       destruct d0 eqn:heq_3;try now inversion H1.
-      unfold offensive_state in H2. simpl in H2. rewrite heq_add in H2. simpl in H2. subst.
+      unfold offensive_state in H2. simpl in H2.  rewrite heq_add in H2. simpl in H2. subst.
       inversion H1.
       inversion H2. clear H1 H2.
       unfold offensive_state .
@@ -165,11 +165,38 @@ Module Offensive_correcte (H:heritage.Herit).
       -- simpl. Search Dico.map.
           apply Dicomore.add_map.
     
-  + admit.
-  + admit.
-  + admit.
-  + admit.
-Admitted.
+  + destruct_with_eqn (stack (frame s)); try now inversion H1.
+    destruct_with_eqn d; try now inversion H1.
+    unfold offensive_state in H2. simpl in H2.
+    setoid_rewrite Heql in H2. 
+    destruct clrf.
+    destruct (H.sub c cl).
+    * inversion H1.
+      inversion H2. clear H1 H2.
+      unfold offensive_regs. simpl.
+      apply O.state_eq_C;try reflexivity.
+      -- simpl. apply O.frame_eq_C;try reflexivity.
+        ++ simpl. unfold offensive_regs.
+           rewrite Dicomore.add_map.
+           simpl. reflexivity.
+    * inversion H1.
+  + destruct_with_eqn (stack (frame s)); try now inversion H1.
+    destruct_with_eqn d; try now inversion H1.
+    destruct_with_eqn i0; try now inversion H1. 
+    *
+     unfold offensive_state in H2. simpl in H2. 
+     setoid_rewrite Heql in H2. simpl in H2.
+     inversion H1. inversion H2. clear H1 H2.
+     unfold offensive_state. simpl. reflexivity.
+
+    * unfold offensive_state in H2. simpl in H2. 
+      setoid_rewrite Heql in H2. simpl in H2.
+      inversion H1. inversion H2. clear H1 H2.
+      unfold offensive_state. simpl. reflexivity.
+  + inversion H1. inversion H2. clear H1 H2.
+     unfold offensive_state. simpl. reflexivity.
+  + inversion H1. inversion H2. rewrite H0. reflexivity.
+Qed.
   
 
 End Offensive_correcte.

@@ -171,12 +171,12 @@ Module D (H:Herit).
 
       | Rload cl_exp ridx =>
           match Dico.find ridx (s.(frame).(regs)) with
-        | Some (Vref (cl_act,ridx)) =>
+        | Some (Vref (cl_act,addr)) =>
           if (H.sub cl_act  cl_exp ) then
           Some {| framestack := s.(framestack); heap := s.(heap);
                   frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                               pc:= pc + 1;
-                              stack:= (Vref (cl_act,ridx)) :: s.(frame).(stack)
+                              stack:= (Vref (cl_act,addr)) :: s.(frame).(stack)
                            |}
                |}
           else
@@ -200,11 +200,11 @@ Module D (H:Herit).
 
       | Rstore cl_exp ridx =>
         match s.(frame).(stack) with
-        | (Vref (cl_act,ridx)) :: stack' =>
+        | (Vref (cl_act,addr)) :: stack' =>
           if (H.sub cl_act cl_exp) then
             Some {| framestack := s.(framestack); heap := s.(heap);
                     frame := {| mdef:=s.(frame).(mdef) ;
-                                regs:= Dico.add ridx (Vref (cl_act,ridx))  (s.(frame).(regs));
+                                regs:= Dico.add ridx (Vref (cl_act,addr))  (s.(frame).(regs));
                                 pc:= pc + 1;
                                 stack:= stack'
                              |}
