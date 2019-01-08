@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>bcv.dvm</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library bcv.dvm</h1>
+
+<div class="code">
+</div>
+
+<div class="doc">
+   Version très simplifiée des idée de: "Java bytecode verification: algorithms
+   and formalizations", Xavier Leroy (Journal of Automated Reasoning,
+   30(3-4):235-269, 2003).
+
+<div class="paragraph"> </div>
+
+   Dont voici l'abstract:
+
+<div class="paragraph"> </div>
+
+   "Bytecode verification is a crucial security component for Java applets, on
+   the Web and on embedded devices such as smart cards. This paper reviews the
+   various bytecode verification algorithms that have been proposed, recasts
+   them in a common framework of dataflow analysis, and surveys the use of proof
+   assistants to specify bytecode verification and prove its correctness."
+
+<div class="paragraph"> </div>
+
+ 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab15"></a><h1 class="section">Valeurs manipulée par la machine défensive,</h1>
+
+
+<div class="paragraph"> </div>
+
+   Ce module servira à instancier VMDefinition plus bas.
+   La définition des types, classes et instruction est fixée dans <span class="inlinecode"><span class="id" title="library">vmtype</span></span>. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="DefVal"><span class="id" title="module">DefVal</span></a> &lt;: <a class="idref" href="bcv.vmdefinition.html#VMVal"><span class="id" title="module">VMVal</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="DefVal.DVal"><span class="id" title="inductive">DVal</span></a>:<span class="id" title="keyword">Set</span> :=<br/>
+&nbsp;&nbsp;| <a name="DefVal.Vint"><span class="id" title="constructor">Vint</span></a> (<span class="id" title="var">i</span>:<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>)<br/>
+&nbsp;&nbsp;| <a name="DefVal.Vref"><span class="id" title="constructor">Vref</span></a> (<span class="id" title="var">clrf</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#d19c7eafd0e2d195d10df94b392087b5"><span class="id" title="notation">×</span></a> <a class="idref" href="bcv.vmtype.html#heap_idx"><span class="id" title="definition">heap_idx</span></a>) </div>
+
+<div class="doc">
+nom de classe * adresse dans le tas 
+</div>
+<div class="code">
+&nbsp;&nbsp;| <a name="DefVal.Vrefnull"><span class="id" title="constructor">Vrefnull</span></a><br/>
+&nbsp;&nbsp;| <a name="DefVal.Error"><span class="id" title="constructor">Error</span></a><br/>
+&nbsp;&nbsp;| <a name="DefVal.NonInit"><span class="id" title="constructor">NonInit</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="DefVal.Val"><span class="id" title="definition">Val</span></a> := <a class="idref" href="bcv.dvm.html#DefVal.DVal"><span class="id" title="inductive">DVal</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Calcul du type d'une valeur défensive. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="DefVal.v2t"><span class="id" title="definition">v2t</span></a> (<span class="id" title="var">v</span>:<a class="idref" href="bcv.dvm.html#DefVal.Val"><span class="id" title="definition">Val</span></a>): <a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="bcv.dvm.html#v"><span class="id" title="variable">v</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="bcv.dvm.html#DefVal.Vint"><span class="id" title="constructor">Vint</span></a> <span class="id" title="var">i</span> ⇒ <a class="idref" href="bcv.vmtype.html#Tint"><span class="id" title="constructor">Tint</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="bcv.dvm.html#DefVal.Vref"><span class="id" title="constructor">Vref</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">(</span></a><span class="id" title="var">clid</span><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">,</span></a><span class="id" title="var">_</span><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#44400027531d4bc3f586a1997dc874c0"><span class="id" title="notation">)</span></a> ⇒ <a class="idref" href="bcv.vmtype.html#Tref"><span class="id" title="constructor">Tref</span></a> <span class="id" title="var">clid</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="bcv.dvm.html#DefVal.Vrefnull"><span class="id" title="constructor">Vrefnull</span></a> ⇒ <a class="idref" href="bcv.vmtype.html#Trefnull"><span class="id" title="constructor">Trefnull</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="bcv.dvm.html#DefVal.Error"><span class="id" title="constructor">Error</span></a> ⇒ <a class="idref" href="bcv.vmtype.html#Top"><span class="id" title="constructor">Top</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="bcv.dvm.html#DefVal.NonInit"><span class="id" title="constructor">NonInit</span></a> ⇒ <a class="idref" href="bcv.vmtype.html#Top"><span class="id" title="constructor">Top</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="DefVal.val_eq_dec"><span class="id" title="lemma">val_eq_dec</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">v1</span> <span class="id" title="var">v2</span>:<a class="idref" href="bcv.dvm.html#DefVal.Val"><span class="id" title="definition">Val</span></a>, <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Specif.html#5bf2050e90b21ebc82dc5463d1ba338e"><span class="id" title="notation">{</span></a><a class="idref" href="bcv.dvm.html#v1"><span class="id" title="variable">v1</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a><a class="idref" href="bcv.dvm.html#v2"><span class="id" title="variable">v2</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Specif.html#5bf2050e90b21ebc82dc5463d1ba338e"><span class="id" title="notation">}+{</span></a><a class="idref" href="bcv.dvm.html#v1"><span class="id" title="variable">v1</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#32263a1c8b01baecdff9deb038955bc9"><span class="id" title="notation">≠</span></a><a class="idref" href="bcv.dvm.html#v2"><span class="id" title="variable">v2</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Specif.html#5bf2050e90b21ebc82dc5463d1ba338e"><span class="id" title="notation">}</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="bcv.dvm.html#DefVal"><span class="id" title="module">DefVal</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="D"><span class="id" title="module">D</span></a> (<span class="id" title="var">H</span>:<a class="idref" href="bcv.heritage.html#Herit"><span class="id" title="module">Herit</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+États défensifs. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Module</span> <a name="D.Def"><span class="id" title="module">Def</span></a> := <a class="idref" href="bcv.vmdefinition.html#VMDefinition"><span class="id" title="module">VMDefinition</span></a>(<a class="idref" href="bcv.dvm.html#DefVal"><span class="id" title="module">DefVal</span></a>)(<a class="idref" href="bcv.dvm.html#H"><span class="id" title="module">H</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Include</span> <a class="idref" href="bcv.dvm.html#D.Def"><span class="id" title="module">Def</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+test 
+</div>
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab16"></a><h1 class="section">Fonction d'exécution défensive d'*un* bytecode.</h1>
+
+
+<div class="paragraph"> </div>
+
+     Pas de vérif d'overflow sur la pile d'opérandes. pas de nb
+     négatifs, on ne vérifie que le typage et les underflow. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="D.exec_step"><span class="id" title="definition">exec_step</span></a> (<span class="id" title="var">s</span>:<a class="idref" href="bcv.dvm.html#D.State"><span class="id" title="record">State</span></a>): <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#option"><span class="id" title="inductive">option</span></a> <a class="idref" href="bcv.dvm.html#D.State"><span class="id" title="record">State</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a>. 
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Functional Scheme</span> <span class="id" title="var">exec_step_ind</span> := <span class="id" title="keyword">Induction</span> <span class="id" title="keyword">for</span> <span class="id" title="var">exec_step</span> <span class="id" title="keyword">Sort</span> <span class="id" title="keyword">Prop</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab17"></a><h1 class="section">Tests</h1>
+
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="5e408a8b9a4300abb963d4811e27e826"><span class="id" title="notation">&quot;</span></a>k --&gt; i , d" := (<a class="idref" href="bcv.lib.html#Dico.add"><span class="id" title="definition">Dico.add</span></a> <span class="id" title="var">k</span> <span class="id" title="var">i</span> <span class="id" title="var">d</span>) (<span class="id" title="tactic">at</span> <span class="id" title="keyword">level</span> 55, <span class="id" title="tactic">right</span> <span class="id" title="keyword">associativity</span>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="D.prog"><span class="id" title="definition">prog</span></a>:<a class="idref" href="bcv.vmtype.html#MethodDef"><span class="id" title="record">MethodDef</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{| <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">instrs</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">(0</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">--&gt;</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Iload</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">1</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">,</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">1</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">--&gt;</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Istore</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">2</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">,</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">2</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">--&gt;</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">ret</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">,</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Dico.empty</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">)</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">argstype</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">:=(</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Tint</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">::</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Tint</span></a><a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">::</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">nil</span></a><a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">);</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">restype</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.vmtype.html#Build_MethodDef"><span class="id" title="constructor">Tint</span></a> |}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="D.startstate"><span class="id" title="definition">startstate</span></a>:<a class="idref" href="bcv.dvm.html#D.State"><span class="id" title="record">State</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{|<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">framestack</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">nil</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">heap</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">Dico.empty</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">frame</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">{|</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">mdef</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">prog</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">regs</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">(0</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">--&gt;</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">Vint</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">32</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">,</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">1--&gt;</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">Vint</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">11,</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">Dico.empty</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">);</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">pc</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">0;</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">stack</span></a><a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">:=</span></a> <a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">nil</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.Build_State"><span class="id" title="constructor">|}</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;|}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Fixpoint</span> <a name="D.exec_n"><span class="id" title="definition">exec_n</span></a> (<span class="id" title="var">s</span> : <a class="idref" href="bcv.dvm.html#D.State"><span class="id" title="record">State</span></a>) (<span class="id" title="var">n</span>:<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>) {<span class="id" title="keyword">struct</span> <span class="id" title="var">n</span>}: <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#option"><span class="id" title="inductive">option</span></a> <a class="idref" href="bcv.dvm.html#D.State"><span class="id" title="record">State</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="bcv.dvm.html#n"><span class="id" title="variable">n</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| 0 ⇒ <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#Some"><span class="id" title="constructor">Some</span></a> <a class="idref" href="bcv.dvm.html#s"><span class="id" title="variable">s</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#S"><span class="id" title="constructor">S</span></a> <span class="id" title="var">n'</span> ⇒<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">match</span> <a class="idref" href="bcv.dvm.html#D.exec_step"><span class="id" title="definition">exec_step</span></a> <a class="idref" href="bcv.dvm.html#s"><span class="id" title="variable">s</span></a> <span class="id" title="keyword">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a> ⇒ <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#None"><span class="id" title="constructor">None</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#Some"><span class="id" title="constructor">Some</span></a> <span class="id" title="var">s'</span> ⇒ <a class="idref" href="bcv.dvm.html#exec_n"><span class="id" title="definition">exec_n</span></a> <span class="id" title="var">s'</span> <span class="id" title="var">n'</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">end</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Exemple de preuve très simple sur la fonction d'exécution: la
+  pile (hormis la méthode en cours d'exécution) ne change pas au cours
+  de exec_step. 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="D.essai"><span class="id" title="lemma">essai</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">s</span> <span class="id" title="var">x</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#D.exec_step"><span class="id" title="definition">exec_step</span></a> <a class="idref" href="bcv.dvm.html#s"><span class="id" title="variable">s</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#Some"><span class="id" title="constructor">Some</span></a> <a class="idref" href="bcv.dvm.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.dvm.html#x"><span class="id" title="variable">x</span></a>.(<a class="idref" href="bcv.dvm.html#D.framestack"><span class="id" title="projection">framestack</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="bcv.dvm.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.dvm.html#D.framestack"><span class="id" title="projection">framestack</span></a>).<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="bcv.dvm.html#D"><span class="id" title="module">D</span></a>.<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

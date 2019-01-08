@@ -1,0 +1,137 @@
+DIGEST 8e4e930c8aff4422e47bc17624262daf
+Fbcv.offensive_correct
+R19:29 Coq.Structures.OrderedType <> <> lib
+R31:43 Coq.Structures.OrderedTypeEx <> <> lib
+R45:58 Coq.Structures.OrderedTypeAlt <> <> lib
+R60:72 Coq.Structures.DecidableType <> <> lib
+R74:88 Coq.Structures.DecidableTypeEx <> <> lib
+R106:120 Coq.Classes.RelationClasses <> <> lib
+R147:152 bcv.vmtype <> <> lib
+R154:156 bcv.dvm <> <> lib
+R158:160 bcv.ovm <> <> lib
+R171:182 bcv.heritage <> <> lib
+R215:228 bcv.heritage Herit <> mod
+mod 193:210 <> Offensive_correcte
+R246:246 bcv.dvm D <> modtype
+R248:248 bcv.offensive_correct H <> modtype
+mod 242:242 <> Offensive_correcte.D
+R265:265 bcv.ovm O <> modtype
+R267:267 bcv.offensive_correct H <> modtype
+mod 261:261 <> Offensive_correcte.O
+def 525:527 Offensive_correcte d2o
+R532:541 bcv.dvm DefVal Val def
+R545:554 bcv.ovm OffVal Val def
+R569:569 bcv.offensive_correct <> v var
+R584:594 bcv.dvm DefVal Vint constr
+R611:621 bcv.dvm DefVal Vref constr
+R623:623 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R625:625 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R627:627 Coq.Init.Datatypes <> :core_scope:'('_x_','_x_','_'..'_','_x_')' not
+R642:656 bcv.dvm DefVal Vrefnull constr
+R671:682 bcv.dvm DefVal Error constr
+R697:710 bcv.dvm DefVal NonInit constr
+def 810:823 Offensive_correcte offensive_regs
+R830:840 bcv.offensive_correct Offensive_correcte Registers syndef
+R845:852 bcv.lib Dico map def
+R858:860 bcv.offensive_correct <> rgs var
+R854:856 bcv.offensive_correct Offensive_correcte d2o def
+def 877:891 Offensive_correcte offensive_stack
+R897:903 bcv.offensive_correct Offensive_correcte Stack syndef
+R908:915 Coq.Lists.List <> map def
+R921:922 bcv.offensive_correct <> st var
+R917:919 bcv.offensive_correct Offensive_correcte d2o def
+def 939:952 Offensive_correcte offensive_heap
+R958:963 bcv.offensive_correct Offensive_correcte Heap syndef
+R972:979 bcv.lib Dico map def
+R1096:1097 bcv.offensive_correct <> hp var
+R1012:1090 bcv.offensive_correct Offensive_correcte Build_Obj constr
+R1059:1066 bcv.lib Dico map def
+R1078:1088 bcv.offensive_correct Offensive_correcte objfields proj
+R1073:1075 bcv.offensive_correct <> obj var
+R1068:1070 bcv.offensive_correct Offensive_correcte d2o def
+R1030:1039 bcv.offensive_correct Offensive_correcte objclass proj
+R1025:1027 bcv.offensive_correct <> obj var
+def 1114:1128 Offensive_correcte offensive_state
+R1133:1139 bcv.offensive_correct Offensive_correcte State rec
+R1144:1150 bcv.offensive_correct Offensive_correcte State rec
+R1180:1369 bcv.offensive_correct Offensive_correcte Build_Frame constr
+R1365:1368 bcv.offensive_correct Offensive_correcte pc proj
+R1355:1361 bcv.offensive_correct Offensive_correcte frame proj
+R1352:1352 bcv.offensive_correct <> s var
+R1294:1308 bcv.offensive_correct Offensive_correcte offensive_stack def
+R1324:1330 bcv.offensive_correct Offensive_correcte stack proj
+R1314:1320 bcv.offensive_correct Offensive_correcte frame proj
+R1311:1311 bcv.offensive_correct <> s var
+R1233:1246 bcv.offensive_correct Offensive_correcte offensive_regs def
+R1262:1267 bcv.offensive_correct Offensive_correcte regs proj
+R1252:1258 bcv.offensive_correct Offensive_correcte frame proj
+R1249:1249 bcv.offensive_correct <> s var
+R1203:1208 bcv.offensive_correct Offensive_correcte mdef proj
+R1193:1199 bcv.offensive_correct Offensive_correcte frame proj
+R1190:1190 bcv.offensive_correct <> s var
+R1384:1468 bcv.offensive_correct Offensive_correcte Build_State constr
+R1444:1457 bcv.offensive_correct Offensive_correcte offensive_heap def
+R1462:1467 bcv.offensive_correct Offensive_correcte heap proj
+R1459:1459 bcv.offensive_correct <> s var
+R1422:1424 Coq.Init.Datatypes <> nil constr
+R1395:1396 bcv.offensive_correct <> fr var
+def 1489:1507 Offensive_correcte offensive_opt_state
+R1512:1517 Coq.Init.Datatypes <> option ind
+R1519:1525 bcv.offensive_correct Offensive_correcte State rec
+R1530:1535 Coq.Init.Datatypes <> option ind
+R1537:1543 bcv.offensive_correct Offensive_correcte State rec
+R1558:1558 bcv.offensive_correct <> s var
+R1573:1576 Coq.Init.Datatypes <> None constr
+R1581:1584 Coq.Init.Datatypes <> None constr
+R1594:1597 Coq.Init.Datatypes <> Some constr
+R1604:1607 Coq.Init.Datatypes <> Some constr
+R1610:1624 bcv.offensive_correct Offensive_correcte offensive_state def
+prf 1648:1652 Offensive_correcte pc_ok
+R1686:1688 Coq.Init.Logic <> :type_scope:x_'='_x not
+R1681:1684 bcv.offensive_correct Offensive_correcte pc proj
+R1670:1676 bcv.offensive_correct Offensive_correcte frame proj
+R1667:1667 bcv.offensive_correct <> s var
+R1720:1723 bcv.offensive_correct Offensive_correcte pc proj
+R1690:1696 bcv.offensive_correct Offensive_correcte frame proj
+R1699:1713 bcv.offensive_correct Offensive_correcte offensive_state def
+R1715:1715 bcv.offensive_correct <> s var
+prf 1777:1783 Offensive_correcte mdef_ok
+R1815:1817 Coq.Init.Logic <> :type_scope:x_'='_x not
+R1796:1801 bcv.offensive_correct Offensive_correcte mdef proj
+R1806:1812 bcv.offensive_correct Offensive_correcte frame proj
+R1803:1803 bcv.offensive_correct <> s var
+R1818:1823 bcv.offensive_correct Offensive_correcte mdef proj
+R1825:1831 bcv.offensive_correct Offensive_correcte frame proj
+R1833:1847 bcv.offensive_correct Offensive_correcte offensive_state def
+R1849:1849 bcv.offensive_correct <> s var
+def 1918:1924 Offensive_correcte d2o_opt
+R1929:1938 Coq.Init.Datatypes <> option_map def
+R1940:1942 bcv.offensive_correct Offensive_correcte d2o def
+R1962:1975 bcv.offensive_correct Offensive_correcte offensive_regs def
+R2002:2006 Coq.Classes.Morphisms ProperNotations :signature_scope:x_'==>'_x not
+R1992:2001 bcv.lib Dico Equal def
+R2007:2016 bcv.lib Dico Equal def
+R2077:2090 bcv.offensive_correct Offensive_correcte offensive_regs def
+R2128:2130 bcv.offensive_correct Offensive_correcte d2o def
+R2138:2140 bcv.offensive_correct Offensive_correcte d2o def
+R2103:2116 bcv.lib Dicomore map_m def
+R2128:2130 bcv.offensive_correct Offensive_correcte d2o def
+R2138:2140 bcv.offensive_correct Offensive_correcte d2o def
+R2103:2116 bcv.lib Dicomore map_m def
+prf 2203:2219 Offensive_correcte find_offensive_ok
+R2306:2339 Coq.Init.Logic <> :type_scope:x_'='_x not
+R2271:2279 bcv.lib Dico find def
+R2287:2300 bcv.offensive_correct Offensive_correcte offensive_regs def
+R2302:2304 bcv.offensive_correct <> rgs var
+R2281:2284 bcv.offensive_correct <> ridx var
+R2340:2346 bcv.offensive_correct Offensive_correcte d2o_opt def
+R2349:2357 bcv.lib Dico find def
+R2364:2366 bcv.offensive_correct <> rgs var
+R2359:2362 bcv.offensive_correct <> ridx var
+R2420:2445 bcv.lib Dicomore map_induction_bis thm
+R2420:2445 bcv.lib Dicomore map_induction_bis thm
+R2552:2565 bcv.offensive_correct Offensive_correcte offensive_regs def
+R2582:2595 bcv.lib Dicomore map_o thm
+R2582:2595 bcv.lib Dicomore map_o thm
+R2582:2595 bcv.lib Dicomore map_o thm
+R4624:4641 bcv.offensive_correct Offensive_correcte <> mod

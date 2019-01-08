@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>bcv.vmdefinition</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library bcv.vmdefinition</h1>
+
+<div class="code">
+</div>
+
+<div class="doc">
+<a name="lab7"></a><h1 class="section">Définition d'une machine virtuelle, paramétrée par le type des valeurs et la définition de l'héritage.</h1>
+
+
+<div class="paragraph"> </div>
+
+On utilisera ce foncteur pour définir les trois machines virtuelles
+(défensive, offensive, abstraite). 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ceci sera un paramètre de VM: le type des valeurs manipulées par la
+    VM + la fonction de typage de ces valeurs. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <span class="id" title="keyword">Type</span> <a name="VMVal"><span class="id" title="module">VMVal</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="keyword">Inline</span> <a name="VMVal.Val"><span class="id" title="axiom">Val</span></a>:<span class="id" title="keyword">Set</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Parameter</span> <span class="id" title="keyword">Inline</span> <a name="VMVal.v2t"><span class="id" title="axiom">v2t</span></a>: <a class="idref" href="bcv.vmdefinition.html#VMVal.Val"><span class="id" title="axiom">Val</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="bcv.vmdefinition.html#VMVal"><span class="id" title="module">VMVal</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Une VM est paramétrée par le type des valeurs et sa fonction de
+    typage, ainsi qu'une relation d'héritage sur les classes . 
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <a name="VMDefinition"><span class="id" title="module">VMDefinition</span></a>(<span class="id" title="var">V</span>:<a class="idref" href="bcv.vmdefinition.html#VMVal"><span class="id" title="module">VMVal</span></a>)(<span class="id" title="var">H</span>:<a class="idref" href="bcv.heritage.html#Herit"><span class="id" title="module">Herit</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab8"></a><h1 class="section">Représentation de l'état interne da la VM.</h1>
+
+<div class="paragraph"> </div>
+
+ Un objet, même offensif est un nom de classe + la valeur des champs. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Record</span> <a name="VMDefinition.Obj"><span class="id" title="record">Obj</span></a>: <span class="id" title="keyword">Type</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <a name="VMDefinition.objclass"><span class="id" title="projection">objclass</span></a>: <a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>; </div>
+
+<div class="doc">
+La classe de l'objet 
+</div>
+<div class="code">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.objfields"><span class="id" title="projection">objfields</span></a>: (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmdefinition.html#V.Val"><span class="id" title="axiom">V.Val</span></a>) </div>
+
+<div class="doc">
+les valeurs des champs 
+</div>
+<div class="code">
+ }.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a> := (<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="bcv.vmdefinition.html#V.Val"><span class="id" title="axiom">V.Val</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="VMDefinition.Registers"><span class="id" title="abbreviation">Registers</span></a> := (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmdefinition.html#V.Val"><span class="id" title="axiom">V.Val</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="VMDefinition.Heap"><span class="id" title="abbreviation">Heap</span></a> := (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Obj"><span class="id" title="record">Obj</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Une frame contient les données d'exécution d'une méthode, la
+  définition de la méthode, les registres locaux à la méthode, sa pile
+  d'opérande et le compteur programme pointant sur l'opération courante. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Record</span> <a name="VMDefinition.Frame"><span class="id" title="record">Frame</span></a> : <span class="id" title="keyword">Type</span> := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.Build_Frame"><span class="id" title="constructor">Build_Frame</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <a name="VMDefinition.mdef"><span class="id" title="projection">mdef</span></a>: <a class="idref" href="bcv.vmtype.html#MethodDef"><span class="id" title="record">MethodDef</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.regs"><span class="id" title="projection">regs</span></a>:  <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Registers"><span class="id" title="abbreviation">Registers</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.stack"><span class="id" title="projection">stack</span></a>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.pc"><span class="id" title="projection">pc</span></a>: <a class="idref" href="bcv.vmtype.html#pc_idx"><span class="id" title="definition">pc_idx</span></a> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+La pile des frame en cours d'exécution 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.Framestack"><span class="id" title="definition">Framestack</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Frame"><span class="id" title="record">Frame</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+L'Etat de la machine virtuelle: la pile des frame + le tas. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Record</span> <a name="VMDefinition.State"><span class="id" title="record">State</span></a> := <a name="VMDefinition.Build_State"><span class="id" title="constructor">Build_State</span></a> { <a name="VMDefinition.frame"><span class="id" title="projection">frame</span></a>:  <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Frame"><span class="id" title="record">Frame</span></a>; <a name="VMDefinition.framestack"><span class="id" title="projection">framestack</span></a>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Framestack"><span class="id" title="definition">Framestack</span></a>; <a name="VMDefinition.heap"><span class="id" title="projection">heap</span></a>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Heap"><span class="id" title="abbreviation">Heap</span></a> }.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab9"></a><h1 class="section">Egalité et compatibilité sur les frame, les stack, les états etc</h1>
+
+
+<div class="paragraph"> </div>
+
+ Ainsi que les propriétés permettant de les utiliser avec rewrite. 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Record</span> <a name="VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a> <span class="id" title="var">f1</span> <span class="id" title="var">f2</span> : <span class="id" title="keyword">Prop</span> := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.frame_eq_C"><span class="id" title="constructor">frame_eq_C</span></a> { <span class="id" title="var">_</span>: <a class="idref" href="bcv.vmdefinition.html#f1"><span class="id" title="variable">f1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.mdef"><span class="id" title="projection">mdef</span></a>)<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a><a class="idref" href="bcv.vmdefinition.html#f2"><span class="id" title="variable">f2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.mdef"><span class="id" title="projection">mdef</span></a>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">_</span>: <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Dico.Equal</span></a> <a class="idref" href="bcv.vmdefinition.html#f1"><span class="id" title="variable">f1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.regs"><span class="id" title="projection">regs</span></a>) <a class="idref" href="bcv.vmdefinition.html#f2"><span class="id" title="variable">f2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.regs"><span class="id" title="projection">regs</span></a>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">_</span>: <a class="idref" href="bcv.vmdefinition.html#f1"><span class="id" title="variable">f1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.stack"><span class="id" title="projection">stack</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="bcv.vmdefinition.html#f2"><span class="id" title="variable">f2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.stack"><span class="id" title="projection">stack</span></a>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="var">_</span>: <a class="idref" href="bcv.vmdefinition.html#f1"><span class="id" title="variable">f1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.pc"><span class="id" title="projection">pc</span></a>)<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a><a class="idref" href="bcv.vmdefinition.html#f1"><span class="id" title="variable">f1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.pc"><span class="id" title="projection">pc</span></a>) }.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a> <span class="id" title="var">r1</span> <span class="id" title="var">r2</span> : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.reg_eq_C"><span class="id" title="constructor">reg_eq_C</span></a> : <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Dico.Equal</span></a> <a class="idref" href="bcv.vmdefinition.html#r1"><span class="id" title="variable">r1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.objfields"><span class="id" title="projection">objfields</span></a>) <a class="idref" href="bcv.vmdefinition.html#r2"><span class="id" title="variable">r2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.objfields"><span class="id" title="projection">objfields</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#r1"><span class="id" title="variable">r1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.objclass"><span class="id" title="projection">objclass</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="bcv.vmdefinition.html#r2"><span class="id" title="variable">r2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.objclass"><span class="id" title="projection">objclass</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#obj_eq"><span class="id" title="inductive">obj_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#r1"><span class="id" title="variable">r1</span></a> <a class="idref" href="bcv.vmdefinition.html#r2"><span class="id" title="variable">r2</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a> <span class="id" title="var">h1</span> <span class="id" title="var">h2</span> : <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.heap_eq_C"><span class="id" title="constructor">heap_eq_C</span></a> : <a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#h1"><span class="id" title="variable">h1</span></a> <a class="idref" href="bcv.vmdefinition.html#h2"><span class="id" title="variable">h2</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#heap_eq"><span class="id" title="inductive">heap_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#h1"><span class="id" title="variable">h1</span></a> <a class="idref" href="bcv.vmdefinition.html#h2"><span class="id" title="variable">h2</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a> <span class="id" title="var">s1</span> <span class="id" title="var">s2</span> : <span class="id" title="keyword">Prop</span> := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.state_eq_C"><span class="id" title="constructor">state_eq_C</span></a> : <a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#s1"><span class="id" title="variable">s1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>) <a class="idref" href="bcv.vmdefinition.html#s2"><span class="id" title="variable">s2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#s1"><span class="id" title="variable">s1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.framestack"><span class="id" title="projection">framestack</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="bcv.vmdefinition.html#s2"><span class="id" title="variable">s2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.framestack"><span class="id" title="projection">framestack</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#s1"><span class="id" title="variable">s1</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap"><span class="id" title="projection">heap</span></a>) <a class="idref" href="bcv.vmdefinition.html#s2"><span class="id" title="variable">s2</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap"><span class="id" title="projection">heap</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#state_eq"><span class="id" title="inductive">state_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#s1"><span class="id" title="variable">s1</span></a> <a class="idref" href="bcv.vmdefinition.html#s2"><span class="id" title="variable">s2</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab10"></a><h2 class="section">Compatibilité entre deux stack, frame state...</h2>
+
+
+<div class="paragraph"> </div>
+
+     a Compatible avec b = a a une type compatible avec celui de b. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.compat_val_type"><span class="id" title="definition">compat_val_type</span></a> <span class="id" title="var">v</span> <span class="id" title="var">t</span> := <a class="idref" href="bcv.vmdefinition.html#H.compat"><span class="id" title="definition">H.compat</span></a> (<a class="idref" href="bcv.vmdefinition.html#V.v2t"><span class="id" title="axiom">V.v2t</span></a> <a class="idref" href="bcv.vmdefinition.html#v"><span class="id" title="variable">v</span></a>) <a class="idref" href="bcv.vmdefinition.html#t"><span class="id" title="variable">t</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.Compat_val_type"><span class="id" title="definition">Compat_val_type</span></a> <span class="id" title="var">v</span> <span class="id" title="var">t</span> := <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_val_type"><span class="id" title="definition">compat_val_type</span></a> <a class="idref" href="bcv.vmdefinition.html#v"><span class="id" title="variable">v</span></a> <a class="idref" href="bcv.vmdefinition.html#t"><span class="id" title="variable">t</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.compat_val"><span class="id" title="definition">compat_val</span></a> <span class="id" title="var">v1</span> <span class="id" title="var">v2</span> := <a class="idref" href="bcv.vmdefinition.html#H.compat"><span class="id" title="definition">H.compat</span></a> (<a class="idref" href="bcv.vmdefinition.html#V.v2t"><span class="id" title="axiom">V.v2t</span></a> <a class="idref" href="bcv.vmdefinition.html#v1"><span class="id" title="variable">v1</span></a>) (<a class="idref" href="bcv.vmdefinition.html#V.v2t"><span class="id" title="axiom">V.v2t</span></a> <a class="idref" href="bcv.vmdefinition.html#v2"><span class="id" title="variable">v2</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.Compat_val"><span class="id" title="definition">Compat_val</span></a> <span class="id" title="var">v1</span> <span class="id" title="var">v2</span> := <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_val"><span class="id" title="definition">compat_val</span></a> <a class="idref" href="bcv.vmdefinition.html#v1"><span class="id" title="variable">v1</span></a> <a class="idref" href="bcv.vmdefinition.html#v2"><span class="id" title="variable">v2</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Inductive</span> <a name="VMDefinition.compat_stack"><span class="id" title="inductive">compat_stack</span></a>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.comstacknil"><span class="id" title="constructor">comstacknil</span></a>: <a class="idref" href="bcv.vmdefinition.html#compat_stack"><span class="id" title="inductive">compat_stack</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nil"><span class="id" title="constructor">nil</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nil"><span class="id" title="constructor">nil</span></a><br/>
+&nbsp;&nbsp;| <a name="VMDefinition.comstackcons"><span class="id" title="constructor">comstackcons</span></a>: <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">e</span> <span class="id" title="var">f</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.vmdefinition.html#compat_stack"><span class="id" title="inductive">compat_stack</span></a> <a class="idref" href="bcv.vmdefinition.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.vmdefinition.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#H.Compat"><span class="id" title="definition">H.Compat</span></a> (<a class="idref" href="bcv.vmdefinition.html#V.v2t"><span class="id" title="axiom">V.v2t</span></a> <a class="idref" href="bcv.vmdefinition.html#e"><span class="id" title="variable">e</span></a>) (<a class="idref" href="bcv.vmdefinition.html#V.v2t"><span class="id" title="axiom">V.v2t</span></a> <a class="idref" href="bcv.vmdefinition.html#f"><span class="id" title="variable">f</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#compat_stack"><span class="id" title="inductive">compat_stack</span></a> (<a class="idref" href="bcv.vmdefinition.html#e"><span class="id" title="variable">e</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#0a8150c3c4df34d205c5ed9a427e2ed5"><span class="id" title="notation">::</span></a><a class="idref" href="bcv.vmdefinition.html#x"><span class="id" title="variable">x</span></a>) (<a class="idref" href="bcv.vmdefinition.html#f"><span class="id" title="variable">f</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#0a8150c3c4df34d205c5ed9a427e2ed5"><span class="id" title="notation">::</span></a><a class="idref" href="bcv.vmdefinition.html#y"><span class="id" title="variable">y</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a> (<span class="id" title="var">x</span> <span class="id" title="var">y</span>:<a class="idref" href="bcv.vmdefinition.html#VMDefinition.Registers"><span class="id" title="abbreviation">Registers</span></a>) := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">i</span> <span class="id" title="var">a</span>, <a class="idref" href="bcv.lib.html#Dico.find"><span class="id" title="definition">Dico.find</span></a> <a class="idref" href="bcv.vmdefinition.html#i"><span class="id" title="variable">i</span></a> <a class="idref" href="bcv.vmdefinition.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#Some"><span class="id" title="constructor">Some</span></a> <a class="idref" href="bcv.vmdefinition.html#a"><span class="id" title="variable">a</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#84eb6d2849dbf3581b1c0c05add5f2d8"><span class="id" title="notation">∃</span></a> <span class="id" title="var">b</span><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#84eb6d2849dbf3581b1c0c05add5f2d8"><span class="id" title="notation">,</span></a> <a class="idref" href="bcv.lib.html#Dico.find"><span class="id" title="definition">Dico.find</span></a> <a class="idref" href="bcv.vmdefinition.html#i"><span class="id" title="variable">i</span></a> <a class="idref" href="bcv.vmdefinition.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#Some"><span class="id" title="constructor">Some</span></a> <a class="idref" href="bcv.vmdefinition.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d82a7d96d3659d805ffe732283716822"><span class="id" title="notation">∧</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val"><span class="id" title="definition">Compat_val</span></a> <a class="idref" href="bcv.vmdefinition.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="bcv.vmdefinition.html#b"><span class="id" title="variable">b</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+La compatibilité entre états: compatiilté du tas et de tous les
+     morceaux de la pile de frame. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Record</span> <a name="VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a> <span class="id" title="var">s</span> <span class="id" title="var">s'</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{ <a name="VMDefinition.compat_st"><span class="id" title="projection">compat_st</span></a>: (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack"><span class="id" title="inductive">compat_stack</span></a> (<a class="idref" href="bcv.vmdefinition.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.stack"><span class="id" title="projection">stack</span></a>)) (<a class="idref" href="bcv.vmdefinition.html#s'"><span class="id" title="variable">s'</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.stack"><span class="id" title="projection">stack</span></a>)));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.compat_rg"><span class="id" title="projection">compat_rg</span></a>: (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a> (<a class="idref" href="bcv.vmdefinition.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.regs"><span class="id" title="projection">regs</span></a>)) (<a class="idref" href="bcv.vmdefinition.html#s'"><span class="id" title="variable">s'</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.regs"><span class="id" title="projection">regs</span></a>)));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.compat_stk"><span class="id" title="projection">compat_stk</span></a>: (<a class="idref" href="bcv.vmdefinition.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.framestack"><span class="id" title="projection">framestack</span></a>) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="bcv.vmdefinition.html#s'"><span class="id" title="variable">s'</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.framestack"><span class="id" title="projection">framestack</span></a>));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.compat_hp"><span class="id" title="projection">compat_hp</span></a>: (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a> (<a class="idref" href="bcv.vmdefinition.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap"><span class="id" title="projection">heap</span></a>)) (<a class="idref" href="bcv.vmdefinition.html#s'"><span class="id" title="variable">s'</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap"><span class="id" title="projection">heap</span></a>)));<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a name="VMDefinition.compat_fr"><span class="id" title="projection">compat_fr</span></a>:(<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">(</span></a><a class="idref" href="bcv.vmdefinition.html#s"><span class="id" title="variable">s</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.mdef"><span class="id" title="projection">mdef</span></a>)<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">(</span></a><a class="idref" href="bcv.vmdefinition.html#s'"><span class="id" title="variable">s'</span></a>.(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame"><span class="id" title="projection">frame</span></a>).(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.mdef"><span class="id" title="projection">mdef</span></a>)<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">)</span></a>) }.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Mécanique de nommage automatique des hypothèses. Ne pas redéfinir
+    ceci, redéfinir rename_vmdef comme ci-dessous. 
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Propriété des relations de compatibilité et d'égalité
+
+<div class="paragraph"> </div>
+
+ (en vue de pouvoir les utiliser dans rewrite). 
+</div>
+<div class="code">
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.Compat_val_refl"><span class="id" title="lemma">Compat_val_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val"><span class="id" title="definition">Compat_val</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.Compat_val_trans"><span class="id" title="lemma">Compat_val_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val"><span class="id" title="definition">Compat_val</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span>: <a class="idref" href="bcv.vmdefinition.html#V.Val"><span class="id" title="axiom">V.Val</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val"><span class="id" title="definition">Compat_val</span></a> <span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val_refl"><span class="id" title="lemma">Compat_val_refl</span></a> <span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Compat_val_trans"><span class="id" title="lemma">Compat_val_trans</span></a> <span class="id" title="keyword">as</span> <span class="id" title="var">Compat_val_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.frame_eq_refl"><span class="id" title="lemma">frame_eq_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.frame_eq_sym"><span class="id" title="lemma">frame_eq_sym</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#symmetric"><span class="id" title="definition">symmetric</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.frame_eq_trans"><span class="id" title="lemma">frame_eq_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+On peut utiliser les tactique <span class="inlinecode"><span class="id" title="tactic">reflexivity</span></span>, <span class="inlinecode"><span class="id" title="tactic">symmetry</span></span> et
+  <span class="inlinecode"><span class="id" title="tactic">transitivity</span></span>. Ainsi que <span class="inlinecode"><span class="id" title="tactic">rewrite</span></span> à condition de déclarer
+  suffisemment de morphismes <span class="inlinecode"><span class="id" title="var">Proper</span></span> comme ci-dessous. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span> : <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Frame"><span class="id" title="record">Frame</span></a> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a> )<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq_refl"><span class="id" title="lemma">frame_eq_refl</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">symmetry</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq_sym"><span class="id" title="lemma">frame_eq_sym</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq_trans"><span class="id" title="lemma">frame_eq_trans</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">frame_eq_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Morphism</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Build_Frame"><span class="id" title="constructor">Build_Frame</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">signature</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(@<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="bcv.vmtype.html#MethodDef"><span class="id" title="record">MethodDef</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> @<a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Dico.Equal</span></a> <a class="idref" href="bcv.vmdefinition.html#V.Val"><span class="id" title="axiom">V.Val</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> @<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> @<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="bcv.vmtype.html#pc_idx"><span class="id" title="definition">pc_idx</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">build_frame_morphism</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.obj_eq_refl"><span class="id" title="lemma">obj_eq_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.obj_eq_sym"><span class="id" title="lemma">obj_eq_sym</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#symmetric"><span class="id" title="definition">symmetric</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.obj_eq_trans"><span class="id" title="lemma">obj_eq_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span> : <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Obj"><span class="id" title="record">Obj</span></a> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a> )<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq_refl"><span class="id" title="lemma">obj_eq_refl</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">symmetry</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq_sym"><span class="id" title="lemma">obj_eq_sym</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq_trans"><span class="id" title="lemma">obj_eq_trans</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">obj_eq_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.equiv_obj_eq_refl"><span class="id" title="lemma">equiv_obj_eq_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> (<a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.equiv_obj_eq_sym"><span class="id" title="lemma">equiv_obj_eq_sym</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#symmetric"><span class="id" title="definition">symmetric</span></a> <span class="id" title="var">_</span> (<a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.equiv_obj_eq_trans"><span class="id" title="lemma">equiv_obj_eq_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> (<a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>).<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span>: (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Obj"><span class="id" title="record">Obj</span></a>) (<a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.equiv_obj_eq_refl"><span class="id" title="lemma">equiv_obj_eq_refl</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">symmetry</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.equiv_obj_eq_sym"><span class="id" title="lemma">equiv_obj_eq_sym</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.equiv_obj_eq_trans"><span class="id" title="lemma">equiv_obj_eq_trans</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">equiv_obj_eq_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.heap_eq_refl"><span class="id" title="lemma">heap_eq_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.heap_eq_sym"><span class="id" title="lemma">heap_eq_sym</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#symmetric"><span class="id" title="definition">symmetric</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.heap_eq_trans"><span class="id" title="lemma">heap_eq_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span> : <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Heap"><span class="id" title="abbreviation">Heap</span></a> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq"><span class="id" title="inductive">heap_eq</span></a> )<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq_refl"><span class="id" title="lemma">heap_eq_refl</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">symmetry</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq_sym"><span class="id" title="lemma">heap_eq_sym</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.heap_eq_trans"><span class="id" title="lemma">heap_eq_trans</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">heap_eq_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.state_eq_refl"><span class="id" title="lemma">state_eq_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.state_eq_sym"><span class="id" title="lemma">state_eq_sym</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#symmetric"><span class="id" title="definition">symmetric</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.state_eq_trans"><span class="id" title="lemma">state_eq_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span> : <a class="idref" href="bcv.vmdefinition.html#VMDefinition.State"><span class="id" title="record">State</span></a> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a> )<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq_refl"><span class="id" title="lemma">state_eq_refl</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">symmetry</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq_sym"><span class="id" title="lemma">state_eq_sym</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq_trans"><span class="id" title="lemma">state_eq_trans</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">state_eq_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Morphism</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Build_State"><span class="id" title="constructor">Build_State</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">signature</span> (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.frame_eq"><span class="id" title="record">frame_eq</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> @<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#eq"><span class="id" title="inductive">eq</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Framestack"><span class="id" title="definition">Framestack</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Dico.Equiv</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.obj_eq"><span class="id" title="inductive">obj_eq</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">build_state_morphism</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_stack_refl"><span class="id" title="lemma">compat_stack_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack"><span class="id" title="inductive">compat_stack</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_stack_trans"><span class="id" title="lemma">compat_stack_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack"><span class="id" title="inductive">compat_stack</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Stack"><span class="id" title="abbreviation">Stack</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack"><span class="id" title="inductive">compat_stack</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack_refl"><span class="id" title="lemma">compat_stack_refl</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_stack_trans"><span class="id" title="lemma">compat_stack_trans</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">compat_stack_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_regs_refl"><span class="id" title="lemma">compat_regs_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_regs_trans"><span class="id" title="lemma">compat_regs_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.Registers"><span class="id" title="abbreviation">Registers</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs_refl"><span class="id" title="lemma">compat_regs_refl</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs_trans"><span class="id" title="lemma">compat_regs_trans</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">compat_regs_rel</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Morphism</span>: (<a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_regs"><span class="id" title="definition">compat_regs</span></a>) <span class="id" title="keyword">with</span> <span class="id" title="var">signature</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Dico.Equal</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Dico.Equal</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#iff"><span class="id" title="definition">iff</span></a>) <span class="id" title="keyword">as</span> <span class="id" title="var">compat_regs_morphism</span>.<br/>
+
+<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Morphism</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a> <span class="id" title="keyword">with</span> <span class="id" title="var">signature</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Classes.Morphisms.html#5bcff5fca4c3a87e683dd8ca07bab63f"><span class="id" title="notation">==&gt;</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#iff"><span class="id" title="definition">iff</span></a>) <span class="id" title="keyword">as</span> <span class="id" title="var">compat_state_morphism</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_state_refl"><span class="id" title="lemma">compat_state_refl</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_state_eq'"><span class="id" title="lemma">compat_state_eq'</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span>, <a class="idref" href="bcv.vmdefinition.html#VMDefinition.state_eq"><span class="id" title="inductive">state_eq</span></a> <a class="idref" href="bcv.vmdefinition.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.vmdefinition.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a> <a class="idref" href="bcv.vmdefinition.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.vmdefinition.html#y"><span class="id" title="variable">y</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="VMDefinition.compat_state_trans"><span class="id" title="lemma">compat_state_trans</span></a> : <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#transitive"><span class="id" title="definition">transitive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Add</span> <span class="id" title="var">Parametric</span> <span class="id" title="var">Relation</span>: <a class="idref" href="bcv.vmdefinition.html#VMDefinition.State"><span class="id" title="record">State</span></a> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state"><span class="id" title="record">compat_state</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">reflexivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state_refl"><span class="id" title="lemma">compat_state_refl</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">transitivity</span> <span class="id" title="var">proved</span> <span class="id" title="tactic">by</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition.compat_state_trans"><span class="id" title="lemma">compat_state_trans</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">as</span> <span class="id" title="var">compat_state_rel</span>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Pour plus de praticité on rend accessiblt tout H et V
+      directement dans Vmdefinition. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Include</span> <a class="idref" href="bcv.vmdefinition.html#H"><span class="id" title="module">H</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Include</span> <a class="idref" href="bcv.vmdefinition.html#V"><span class="id" title="module">V</span></a>.<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="bcv.vmdefinition.html#VMDefinition"><span class="id" title="module">VMDefinition</span></a>.<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

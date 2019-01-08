@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>bcv.vmtype</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library bcv.vmtype</h1>
+
+<div class="code">
+</div>
+
+<div class="doc">
+<a name="lab3"></a><h1 class="section">Les types de base de la machine virtuelle</h1>
+
+</div>
+<div class="code">
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Toutes les adresses sont des entiers naturels (<span class="inlinecode"><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a></span>). 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <a name="heap_idx"><span class="id" title="definition">heap_idx</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="reg_idx"><span class="id" title="definition">reg_idx</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="pc_idx"><span class="id" title="definition">pc_idx</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="fld_idx"><span class="id" title="definition">fld_idx</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="class_id"><span class="id" title="definition">class_id</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+<span class="id" title="keyword">Definition</span> <a name="meth_id"><span class="id" title="definition">meth_id</span></a> := <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Les types, y compris les types nécessaires au vérificateur. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a name="VMType"><span class="id" title="inductive">VMType</span></a>:<span class="id" title="keyword">Set</span> := <a name="Tint"><span class="id" title="constructor">Tint</span></a> | <a name="Tref"><span class="id" title="constructor">Tref</span></a> (<span class="id" title="var">id</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>) | <a name="Object"><span class="id" title="constructor">Object</span></a> | <a name="Top"><span class="id" title="constructor">Top</span></a> | <a name="Trefnull"><span class="id" title="constructor">Trefnull</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Profil d'une classe = type des champs (map: numero de champ --&gt; type). 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="ClasseDef"><span class="id" title="abbreviation">ClasseDef</span></a> := (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ensemble de tous les profils de classes (map: numero de classe --&gt; type ). 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="AllClassesDef"><span class="id" title="abbreviation">AllClassesDef</span></a> := (<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmtype.html#ClasseDef"><span class="id" title="abbreviation">ClasseDef</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Les instructions. Notez que les instructions sont fortement
+    typées. C'est-à-dire qu'elles comportent la classe attendue sur la
+    pile avant l'opération (ex: Rstore,Getfield,Putfield) et/ou la
+    classe attendu sur la pile après l'opération (ex:
+    Rload,Getfield,Putfield). Notez qu'il n'y a pas d'appel de méthode
+    en l'état actuel, pour l'instant on va programmer un vérificateur
+    de méthode isolée. Ajouter l'appel de méthode est une option du projet. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Inductive</span> <a name="Instr"><span class="id" title="inductive">Instr</span></a> : <span class="id" title="keyword">Set</span> :=<br/>
+| <a name="Iconst"><span class="id" title="constructor">Iconst</span></a> (<span class="id" title="var">i</span>:<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a>)<br/>
+| <a name="Iadd"><span class="id" title="constructor">Iadd</span></a><br/>
+| <a name="Iload"><span class="id" title="constructor">Iload</span></a> (<span class="id" title="var">ridx</span>:<a class="idref" href="bcv.vmtype.html#reg_idx"><span class="id" title="definition">reg_idx</span></a>)<br/>
+| <a name="Rload"><span class="id" title="constructor">Rload</span></a> (<span class="id" title="var">cl</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>) (<span class="id" title="var">ridx</span>:<a class="idref" href="bcv.vmtype.html#reg_idx"><span class="id" title="definition">reg_idx</span></a>)<br/>
+| <a name="Istore"><span class="id" title="constructor">Istore</span></a> (<span class="id" title="var">ridx</span>:<a class="idref" href="bcv.vmtype.html#reg_idx"><span class="id" title="definition">reg_idx</span></a>)<br/>
+| <a name="Rstore"><span class="id" title="constructor">Rstore</span></a> (<span class="id" title="var">cl</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>) (<span class="id" title="var">ridx</span>:<a class="idref" href="bcv.vmtype.html#reg_idx"><span class="id" title="definition">reg_idx</span></a>)<br/>
+| <a name="Iifle"><span class="id" title="constructor">Iifle</span></a> (<span class="id" title="var">pc</span>:<a class="idref" href="bcv.vmtype.html#pc_idx"><span class="id" title="definition">pc_idx</span></a>)<br/>
+| <a name="Goto"><span class="id" title="constructor">Goto</span></a> (<span class="id" title="var">pc</span>:<a class="idref" href="bcv.vmtype.html#pc_idx"><span class="id" title="definition">pc_idx</span></a>)<br/>
+| <a name="Getfield"><span class="id" title="constructor">Getfield</span></a> (<span class="id" title="var">cl</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>) (<span class="id" title="var">fldrf</span>:<a class="idref" href="bcv.vmtype.html#fld_idx"><span class="id" title="definition">fld_idx</span></a>) (<span class="id" title="var">typ</span>:<a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a>)<br/>
+| <a name="Putfield"><span class="id" title="constructor">Putfield</span></a> (<span class="id" title="var">cl</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>) (<span class="id" title="var">fldrf</span>:<a class="idref" href="bcv.vmtype.html#fld_idx"><span class="id" title="definition">fld_idx</span></a>) (<span class="id" title="var">typ</span>:<a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a>)<br/>
+| <a name="New"><span class="id" title="constructor">New</span></a> (<span class="id" title="var">clid</span>:<a class="idref" href="bcv.vmtype.html#class_id"><span class="id" title="definition">class_id</span></a>)<br/>
+| <a name="ret"><span class="id" title="constructor">ret</span></a>.<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Méthode = type arguments + type retour  + dictionnaire d'instructions. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Record</span> <a name="MethodDef"><span class="id" title="record">MethodDef</span></a> := { <a name="instrs"><span class="id" title="projection">instrs</span></a>:(<a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.vmtype.html#Instr"><span class="id" title="inductive">Instr</span></a>); <a name="argstype"><span class="id" title="projection">argstype</span></a>: <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#list"><span class="id" title="inductive">list</span></a> <a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a>; <a name="restype"><span class="id" title="projection">restype</span></a>:<a class="idref" href="bcv.vmtype.html#VMType"><span class="id" title="inductive">VMType</span></a> }.<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>

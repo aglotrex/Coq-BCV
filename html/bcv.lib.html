@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<title>bcv.lib</title>
+</head>
+
+<body>
+
+<div id="page">
+
+<div id="header">
+</div>
+
+<div id="main">
+
+<h1 class="libtitle">Library bcv.lib</h1>
+
+<div class="code">
+
+<br/>
+</div>
+
+<div class="doc">
+Un module pour regrouper les propriétés sur les maps. On met tout
+    ce qu'il y a dans WProperties et WFacts + qq propriétés
+    supplémentaires prouvées ci-dessous. Voir à la fin du fichier pour
+    le module Dico qui servira partout dans ce développement. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <a name="MoreMaps"><span class="id" title="module">MoreMaps</span></a> (<span class="id" title="var">Dico</span>:<a class="idref" href="http://coq.inria.fr/stdlib//Coq.FSets.FMapInterface.html#S"><span class="id" title="module">FMapInterface.S</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Toutes celles de la lib standard... 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Include</span> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.FSets.FMapFacts.html#WProperties"><span class="id" title="module">FMapFacts.WProperties</span></a>(<a class="idref" href="bcv.lib.html#Dico"><span class="id" title="module">Dico</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Include</span> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.FSets.FMapFacts.html#WFacts"><span class="id" title="module">FMapFacts.WFacts</span></a>(<a class="idref" href="bcv.lib.html#Dico"><span class="id" title="module">Dico</span></a>).<br/>
+
+<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Plus quelques autres. 
+</div>
+<div class="code">
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.Empty_eq"><span class="id" title="lemma">Empty_eq</span></a>: <span class="id" title="keyword">∀</span> (<span class="id" title="var">elt</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">x</span> <span class="id" title="var">y</span> : <a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="axiom">t</span></a> <a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#Dico.Empty"><span class="id" title="definition">Empty</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#Dico.Empty"><span class="id" title="definition">Empty</span></a> (<span class="id" title="var">elt</span>:=<a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a>) <a class="idref" href="bcv.lib.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.lib.html#y"><span class="id" title="variable">y</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.Empty_eq_empty"><span class="id" title="lemma">Empty_eq_empty</span></a>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> (<span class="id" title="var">elt</span> : <span class="id" title="keyword">Type</span>) (<span class="id" title="var">x</span> : <a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="axiom">t</span></a> <a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#Dico.Empty"><span class="id" title="definition">Empty</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a>   <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.lib.html#Dico.empty"><span class="id" title="axiom">empty</span></a> .<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.add_map"><span class="id" title="lemma">add_map</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">k</span> (<span class="id" title="var">x</span>:<a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a>) <span class="id" title="var">l</span> (<span class="id" title="var">f</span>:<a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#B"><span class="id" title="variable">B</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="bcv.lib.html#Dico.map"><span class="id" title="axiom">map</span></a> <a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> (<a class="idref" href="bcv.lib.html#Dico.add"><span class="id" title="axiom">add</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.lib.html#l"><span class="id" title="variable">l</span></a>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<a class="idref" href="bcv.lib.html#Dico.add"><span class="id" title="axiom">add</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> (<a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a>) (<a class="idref" href="bcv.lib.html#Dico.map"><span class="id" title="axiom">map</span></a> <a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="bcv.lib.html#l"><span class="id" title="variable">l</span></a>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.add_map2"><span class="id" title="lemma">add_map2</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span> <span class="id" title="var">k</span> (<span class="id" title="var">x</span>:<a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a>) <span class="id" title="var">l</span> (<span class="id" title="var">f</span>:<a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#B"><span class="id" title="variable">B</span></a>) <span class="id" title="var">P</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">(</span></a><span class="id" title="keyword">∀</span> <span class="id" title="var">m</span> <span class="id" title="var">m'</span> : <a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="axiom">t</span></a> <a class="idref" href="bcv.lib.html#B"><span class="id" title="variable">B</span></a>, <a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a> <a class="idref" href="bcv.lib.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="bcv.lib.html#m'"><span class="id" title="variable">m'</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="bcv.lib.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#P"><span class="id" title="variable">P</span></a> <a class="idref" href="bcv.lib.html#m'"><span class="id" title="variable">m'</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#P"><span class="id" title="variable">P</span></a>(<a class="idref" href="bcv.lib.html#Dico.map"><span class="id" title="axiom">map</span></a> <a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> (<a class="idref" href="bcv.lib.html#Dico.add"><span class="id" title="axiom">add</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="bcv.lib.html#l"><span class="id" title="variable">l</span></a>)) <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#P"><span class="id" title="variable">P</span></a>(<a class="idref" href="bcv.lib.html#Dico.add"><span class="id" title="axiom">add</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> (<a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="bcv.lib.html#x"><span class="id" title="variable">x</span></a>) (<a class="idref" href="bcv.lib.html#Dico.map"><span class="id" title="axiom">map</span></a> <a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="bcv.lib.html#l"><span class="id" title="variable">l</span></a>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.empty_map"><span class="id" title="lemma">empty_map</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> <span class="id" title="var">B</span> (<span class="id" title="var">f</span>:<a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#B"><span class="id" title="variable">B</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a> (<a class="idref" href="bcv.lib.html#Dico.map"><span class="id" title="axiom">map</span></a> <a class="idref" href="bcv.lib.html#f"><span class="id" title="variable">f</span></a> <a class="idref" href="bcv.lib.html#Dico.empty"><span class="id" title="axiom">empty</span></a>) <a class="idref" href="bcv.lib.html#Dico.empty"><span class="id" title="axiom">empty</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="MoreMaps.Equiv_refl_Equal"><span class="id" title="lemma">Equiv_refl_Equal</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">elt</span> (<span class="id" title="var">Req</span>:<a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <span class="id" title="keyword">Prop</span>) (<span class="id" title="var">Req_refl</span>:<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Relations.Relation_Definitions.html#reflexive"><span class="id" title="definition">reflexive</span></a> <span class="id" title="var">_</span> <a class="idref" href="bcv.lib.html#Req"><span class="id" title="variable">Req</span></a>) (<span class="id" title="var">m</span> <span class="id" title="var">m'</span> : <a class="idref" href="bcv.lib.html#Dico.t"><span class="id" title="axiom">t</span></a> <a class="idref" href="bcv.lib.html#elt"><span class="id" title="variable">elt</span></a>),<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#Dico.Equal"><span class="id" title="definition">Equal</span></a> <a class="idref" href="bcv.lib.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="bcv.lib.html#m'"><span class="id" title="variable">m'</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <a class="idref" href="bcv.lib.html#Dico.Equiv"><span class="id" title="definition">Equiv</span></a> <a class="idref" href="bcv.lib.html#Req"><span class="id" title="variable">Req</span></a> <a class="idref" href="bcv.lib.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="bcv.lib.html#m'"><span class="id" title="variable">m'</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="bcv.lib.html#MoreMaps"><span class="id" title="module">MoreMaps</span></a>.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+<a name="lab1"></a><h1 class="section"><span class="inlinecode"><a class="idref" href="bcv.lib.html#Dico"><span class="id" title="module">Dico</span></a></span>et <span class="inlinecode"><a class="idref" href="bcv.lib.html#Dicomore"><span class="id" title="module">Dicomore</span></a></span> formalisent les maps (dictionnaires) ayant pour clés des <span class="inlinecode"><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#nat"><span class="id" title="inductive">nat</span></a></span> et polymorphes sur les valeurs.</h1>
+
+
+<div class="paragraph"> </div>
+
+Il serviront pour représenter la mémoire, les programmes etc. 
+</div>
+<div class="code">
+
+<br/>
+<span class="id" title="keyword">Module</span> <a name="Dico"><span class="id" title="module">Dico</span></a>:=<a class="idref" href="http://coq.inria.fr/stdlib//Coq.FSets.FMapList.html#Make"><span class="id" title="module">Make</span></a>(<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Structures.OrderedTypeEx.html#Nat_as_OT"><span class="id" title="module">Nat_as_OT</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Tout le reste (définition supplémentaire et très nombreuses
+propriétés) est dans <span class="inlinecode"><a class="idref" href="bcv.lib.html#Dicomore"><span class="id" title="module">Dicomore</span></a></span>. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Module</span> <a name="Dicomore"><span class="id" title="module">Dicomore</span></a>:=<a class="idref" href="bcv.lib.html#MoreMaps"><span class="id" title="module">MoreMaps</span></a>(<a class="idref" href="bcv.lib.html#Dico"><span class="id" title="module">Dico</span></a>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Une notation plus compacte pour find. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Notation</span> <a name="FIND"><span class="id" title="abbreviation">FIND</span></a> := (@<a class="idref" href="bcv.lib.html#find"><span class="id" title="definition">Dico.find</span></a> <span class="id" title="var">_</span>).<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Ce qui suit est spécifique à Dico car utilise le fait que les clés
+    sont des entiers. 
+<div class="paragraph"> </div>
+
+<a name="lab2"></a><h1 class="section">Génération de clés <tt>fraîches</tt>.</h1>
+
+<div class="paragraph"> </div>
+
+ Fonction auxiliaire: retourne le plus grand index utilisé dans <span class="inlinecode"><a class="idref" href="bcv.lib.html#hp"><span class="id" title="variable">hp</span></a></span>. Permet
+    de retourner un index "frais" dans la suite. 
+</div>
+<div class="code">
+<span class="id" title="keyword">Definition</span> <a name="maxkey"><span class="id" title="definition">maxkey</span></a> {<span class="id" title="var">A</span>} (<span class="id" title="var">hp</span>:(<a class="idref" href="bcv.lib.html#t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a>)) :=<br/>
+&nbsp;&nbsp;<a class="idref" href="bcv.lib.html#fold"><span class="id" title="definition">Dico.fold</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">k</span> <span class="id" title="var">e</span> <span class="id" title="var">acc</span> ⇒ <span class="id" title="keyword">if</span> (<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Arith.Compare_dec.html#lt_dec"><span class="id" title="lemma">Compare_dec.lt_dec</span></a> <a class="idref" href="bcv.lib.html#acc"><span class="id" title="variable">acc</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a>) <span class="id" title="keyword">then</span> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> <span class="id" title="keyword">else</span> <a class="idref" href="bcv.lib.html#acc"><span class="id" title="variable">acc</span></a>) <a class="idref" href="bcv.lib.html#hp"><span class="id" title="variable">hp</span></a> 0.<br/>
+
+<br/>
+</div>
+
+<div class="doc">
+Propriété basique de maxkey: l'index retourné est bien "frais". 
+</div>
+<div class="code">
+<span class="id" title="keyword">Lemma</span> <a name="maxkey_correct"><span class="id" title="lemma">maxkey_correct</span></a> : <span class="id" title="keyword">∀</span> <span class="id" title="var">A</span> (<span class="id" title="var">h</span>:<a class="idref" href="bcv.lib.html#t"><span class="id" title="definition">Dico.t</span></a> <a class="idref" href="bcv.lib.html#A"><span class="id" title="variable">A</span></a>) <span class="id" title="var">k</span>, <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Peano.html#19ab5cfd7e4f60fa14f22b576013bd96"><span class="id" title="notation">&gt;(</span></a><a class="idref" href="bcv.lib.html#maxkey"><span class="id" title="definition">maxkey</span></a> <a class="idref" href="bcv.lib.html#h"><span class="id" title="variable">h</span></a><a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Peano.html#19ab5cfd7e4f60fa14f22b576013bd96"><span class="id" title="notation">)</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#d43e996736952df71ebeeae74d10a287"><span class="id" title="notation">→</span></a> <br/>
+&nbsp;&nbsp;<a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#611abc97cba304de784fa909dbdea1fa"><span class="id" title="notation">¬</span></a><a class="idref" href="bcv.lib.html#mem"><span class="id" title="definition">Dico.mem</span></a> <a class="idref" href="bcv.lib.html#k"><span class="id" title="variable">k</span></a> <a class="idref" href="bcv.lib.html#h"><span class="id" title="variable">h</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Logic.html#1c39bf18749e5cc609e83c0a0ba5a372"><span class="id" title="notation">=</span></a> <a class="idref" href="http://coq.inria.fr/stdlib//Coq.Init.Datatypes.html#true"><span class="id" title="constructor">true</span></a>.<br/>
+
+<br/>
+</div>
+</div>
+
+<div id="footer">
+<hr/><a href="index.html">Index</a><hr/>This page has been generated by <a href="http://coq.inria.fr/">coqdoc</a>
+</div>
+
+</div>
+
+</body>
+</html>
