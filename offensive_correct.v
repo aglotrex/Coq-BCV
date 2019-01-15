@@ -100,6 +100,8 @@ Module Offensive_correcte (H:heritage.Herit).
                             {| O.objclass  := D.objclass obj;
                                O.objfields := Dico.map d2o (D.objfields obj) |})
                           y').
+Proof.
+  Admitted.
 
   (** Diagramme de commutation entre D et O.*)
   Lemma offensive_ok : 
@@ -172,7 +174,7 @@ Module Offensive_correcte (H:heritage.Herit).
     unfold offensive_regs. simpl.
   
     apply O.state_eq_C;try reflexivity.
-    * simpl.
+    * simpl. 
       apply O.frame_eq_C;try reflexivity.
       -- simpl. Search Dico.map.
           apply Dicomore.add_map.
@@ -232,18 +234,19 @@ Module Offensive_correcte (H:heritage.Herit).
       reflexivity.
 
   + admit.
-  + destruct_with_eqn (new clid (heap s)); try now inversion H1.
-    destruct p.
-    unfold offensive_state in H2. simpl in H2.
-  
-    unfold offensive_heap in H2. simpl in H2.
+  + unfold new in H1;simpl in H1.
     
-    unfold O.new in H2.  
-    rewrite Dicomore.F.map_o in H2.
-    
+    destruct_with_eqn (FIND clid allcl ); try now inversion H1.
+    unfold offensive_state in H2.
+    unfold O.new in H2. simpl in H2.
+    rewrite Heqo in H2. simpl in H2. subst.
+rewrite maxkey_off_ok in H2. 
+    simpl in H2.
+unfold offensive_stack in H2.  simpl in H2.
+admit.
   + 
    inversion H1. inversion H2. rewrite H0. reflexivity.
-Qed.
+Admitted.
   
 
 End Offensive_correcte.

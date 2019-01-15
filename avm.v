@@ -35,7 +35,198 @@ Module A (Import H:Herit).
 (** * Exécution de la machine défensive.
    Pas de vérif de overflow. pas de nb négatifs. *)
   Function exec_step (s:State): list (option State) :=
-    []. (* FAUX. À REMPLIR *) 
+    Definition exec_step (s:State): option State :=
+    let frm:Frame := s.(frame) in
+    let pc: pc_idx := frm.(pc) in
+    let instr_opt := Dico.find pc (frm.(mdef).(instrs)) in
+    match instr_opt with
+    | None => [None]
+    | Some instr =>
+      match instr with
+        | ret => [Some s]
+        | Iconst i =>
+             [Some {| framestack := s.(framestack); heap := s.(heap);
+                frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                            pc:= pc + 1;
+                            stack:= DefVal.Tint i :: s.(frame).(stack)
+                         |}
+             |}} ]
+          
+       |Iadd =>
+          match s.(frame).(stack) with
+              | nil => [None]
+              | Tint i1 :: nil => None
+              | Tint i1 :: Tint i2 :: stack' => 
+                [Some {| framestack := s.(framestack); heap := s.(heap);
+                        frame := {| mdef:=s.(frame).(mdef); regs:= s.(frame).(regs);
+                                    pc:= pc + 1;
+                                    stack:= Tint (i1+i2) :: stack'
+                                 |}
+                     |}]
+              | _  => [None]
+              end
+      | Iload ridx =>
+        match Dico.find ridx (s.(frame).(regs)) with
+        | Some (Tint i) =>
+          [Some {| framestack := s.(framestack); heap := s.(heap);
+                  frame := {| mdef:=s.(frame).(mdef); regs:= s.(frame).(regs);
+                              pc:= pc + 1;
+                              stack:= (Tint i) :: s.(frame).(stack)
+                           |}
+               |}]
+        | _ => [None] (** Bad register number *)
+        end
+
+      | Rload cl_exp ridx =>
+          match Dico.find ridx (s.(frame).(regs)) with
+        | Some (Vref (cl_act,addr)) =>
+          if (H.sub cl_act  cl_exp ) then
+          Some {| framestack := s.(framestack); heap := s.(heap);
+                  frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                              pc:= pc + 1;
+                              stack:= (Vref (cl_act,addr)) :: s.(frame).(stack)
+                           |}
+               |}
+          else
+            None
+        | _ => None (** Bad register number *)
+        end
+
+      | Istore ridx =>
+        match s.(frame).(stack) with
+        | (Tint i) :: stack' =>
+            [Some {| framestack := s.(framestack); heap := s.(heap);
+                    frame := {| mdef:=s.(frame).(mdef) ;
+                                regs:= Dico.add ridx (Vint i) (s.(frame).(regs));
+                                pc:= pc + 1;
+                                stack:= stack'
+                             |}
+                 |}]
+        | _ => [None] (** Stack underflow *)
+        end
+        
+
+      | Rstore cl_exp ridx =>
+        match s.(frame).(stack) with
+        | (Vref (cl_act,addr)) :: stack' =>
+          if (H.sub cl_act cl_exp) then
+            [Some {| framestack := s.(framestack); heap := s.(heap);
+                    frame := {| mdef:=s.(frame).(mdef) ;
+                                regs:= Dico.add ridx (Vref (cl_act,addr))  (s.(frame).(regs));
+                                pc:= pc + 1;
+                                stack:= stack'
+                             |}
+                 |}]
+          else 
+          [None]
+            
+        | _ =>  [None] (** Stack underflow *)
+        end
+       
+
+      | Iifle jmp => (** ifeqe *)
+      
+
+ 
+      match s.(frame).(stack) with
+        | (Tint 0) :: stack' => (** = 0  --> jump *)
+          [Some {| framestack := s.(framestack); heap := s.(heap);
+                  frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                              pc:= jmp;
+                              stack:= stack'
+                           |}
+               |}]
+        | (Tint _ ):: stack' => (** <> 0  --> pc+1 *)
+          [Some {| framestack := s.(framestack); heap := s.(heap);
+                  frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                              pc:= pc+1;
+                              stack:= stack'
+                           |}
+               |}]
+        | _ => [None] (** Stack underflow *)
+        end
+    
+
+      | Goto jmp =>
+        [Some {| framestack := s.(framestack); heap := s.(heap);
+                frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                            stack:= s.(frame).(stack);
+                            pc:= jmp
+                         |}
+             |}]
+
+      | Getfield cl namefld typ =>
+        match s.(frame).(stack) with
+        | Tref (classid,hpidx) :: stack' =>
+          if (H.sub classid cl) then
+          match Dico.find hpidx s.(heap) with
+          | None => [None] (** adresse inconnue *)
+          | Some {|objclass:= objcl; objfields:= flds |} => (* TODO: vérifier le type retourné? *)
+            if (H.sub objcl cl) then
+            match Dico.find namefld flds with
+            | None => [None] (** Champ de classe inconnu ou pas initialisé *)
+            | Some v =>
+              [Some {| framestack := s.(framestack); heap := s.(heap);
+                      frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                                  pc:= pc+1;
+                                  stack:= v :: stack'
+                               |}
+                   |}]
+            end
+            else [None]
+          end
+          else [None]
+        | _  => [None] (** Stack underflow *)
+        end
+
+      | Putfield cl namefld typ =>
+        match s.(frame).(stack) with
+        | Tref (classid,hpidx) :: v :: stack' =>
+          if (H.sub classid cl) then
+          match FIND cl H.allcl with
+          | None => [None]
+          | Some (cldef) =>
+            match FIND namefld cldef with
+            | None => [None]
+            | Some (typfld) =>
+              let typv := D.v2t v in
+              if compat typv typfld then
+              match Dico.find hpidx s.(heap) with
+              | None => [None] (** adresse inconnue, objet non alloué *)
+              | Some {| objclass:= objcl; objfields:= flds |}=>
+                let newflds := {| objclass:= objcl;
+                                  objfields:=Dico.add namefld v flds |} in
+                let newheap := Dico.add hpidx newflds s.(heap) in
+                [Some {| framestack := s.(framestack);
+                        heap := newheap;
+                        frame := {| mdef:=s.(frame).(mdef) ;
+                                    regs:= s.(frame).(regs);
+                                    pc:= pc+1;
+                                    stack:= stack'
+                                 |}
+                     |}]
+              end
+              else [None]
+            end
+          end
+          else [None]
+        | _ => [None] (** Stack underflow *) 
+        end
+
+      | New clid =>
+        match new clid s.(heap) with
+        | None => [None] (** Classe inconnue *)
+        | Some (newobj,newhp) =>
+           [Some {| framestack := s.(framestack); heap := newhp;
+                  frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
+                              stack:= (Vref newobj) :: s.(frame).(stack);
+                              pc:= pc+1
+                           |}
+               |}]
+
+        end
+      end
+    end.
 
 
 (** * Tests *)
@@ -96,6 +287,6 @@ Module A (Import H:Herit).
     functional induction exec_step s;intros ;simpl;
       try solve [discriminate | inversion H; subst;simpl;reflexivity] .
   Qed.
-
+  
 End A.
 
