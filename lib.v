@@ -112,6 +112,176 @@ Module MoreMaps (Dico:FMapInterface.S).
       apply Req_refl.
   Qed.
 
+
+  Lemma Equiv_refl:
+    forall (elt : Type) (Req : elt -> elt -> Prop),
+      reflexive elt Req -> reflexive (t elt) (Equiv Req).
+  Proof.
+    unfold Equiv.
+    intros elt Req H.
+    red.
+    intros x. 
+    split;intros;auto.
+    - reflexivity.
+    - erewrite (@F.MapsTo_fun _ _ k e e');eauto.
+  Qed.
+
+  Lemma Equiv_sym:
+    forall (elt : Type) (Req : elt -> elt -> Prop),
+      symmetric elt Req -> symmetric (t elt) (Equiv Req).
+  Proof.
+    unfold Equiv.
+    intros elt Req h_sym.
+    red.
+    intros x y [h1 h2]. 
+    split;intros;auto.
+    - symmetry.
+      apply h1.
+    - apply h_sym.
+      eapply h2;eauto.
+  Qed.
+
+  Lemma Equiv_trans:
+    forall (elt : Type) (Req : elt -> elt -> Prop),
+      transitive elt Req -> transitive (t elt) (Equiv Req).
+  Proof.
+    unfold Equiv.
+    intros elt Req h_trans.
+    red.
+    intros x y z [h1 h2] [h3 h4].
+    split;intros. 
+    - transitivity (In k y).
+      + apply h1.
+      + apply h3.
+    - red in h_trans.
+      assert (In k x) as hInx by (red;eauto).
+      rewrite h1 in hInx.
+      red in hInx.
+      destruct hInx as [? h_mapstoy].
+      eapply h_trans.
+      + eapply h2;eauto.
+      + eapply h4;eauto.
+  Qed.
+  
+  Add Parametric Relation (elt : Type) {R:relation elt} {H:Equivalence R}:    (t elt) (Equiv R)
+      reflexivity proved by (@Equiv_refl elt R (@Equivalence_Reflexive elt R H))
+      symmetry proved by (@Equiv_sym elt R (@Equivalence_Symmetric elt R H))
+      transitivity proved by (@Equiv_trans elt R (@Equivalence_Transitive elt R H))
+        as EquivSetoid.
+
+  (* Instance equiv_equiv: forall elt :Type, forall  R:elt -> elt -> Prop, *)
+        (* Equivalence R -> Equivalence (Equiv R). *)
+  (* Proof. *)
+    
+  (* Admitted. *)
+
+  Add Parametric Morphism (elt elt': Type) {RA:relation elt} {RB: relation elt'}
+      {Ha:Equivalence RA}{Hb:Equivalence RB}: (@map elt elt')
+      with signature ((RA ==> RB) ==> (@Dico.Equiv elt RA) ==> @Dico.Equiv elt' RB)
+        as map_morph.
+  Proof.
+    intros x y hcompat x0 y0 hEquiv.
+    red in hcompat,hEquiv|-*.
+    destruct hEquiv as [hinin hmapsto].
+    split;intros.
+    - setoid_rewrite F.map_in_iff.
+      apply hinin.
+    - apply F.map_mapsto_iff in H;destruct H as [a [heqe hmapstok]].
+      apply F.map_mapsto_iff in H0;destruct H0 as [b [heqe' hmapstok']].
+      subst.
+      specialize hmapsto with (1:=hmapstok)(2:=hmapstok').
+      apply hcompat.
+      assumption.
+  Qed.
+
+  Add Parametric Morphism (elt: Type) {RA:relation elt}
+      {Ha:Equivalence RA}: (@add elt)
+      with signature (E.eq ==> RA ==> (@Dico.Equiv elt RA) ==> @Dico.Equiv elt RA)
+        as add_morph.
+  Proof.
+    intros x y H x0 y0 hRA_x0_y0 x1 y1 hequiv_x1_x2.
+    red in hequiv_x1_x2|-*.
+    destruct hequiv_x1_x2 as [hInx0_y1 hmapsto].
+    split.
+    - intros.
+      setoid_rewrite F.add_in_iff.
+      split;intros [heq | hIn];auto.
+      + left.
+        transitivity x;auto.
+      + right.
+        apply hInx0_y1.
+        assumption.
+      + left.
+        transitivity y;auto.
+      + right.
+        apply hInx0_y1.
+        assumption.
+    - intros ? ? ? hmapstok_e hmapstok_e'.
+      apply F.add_mapsto_iff in hmapstok_e.
+      apply F.add_mapsto_iff in hmapstok_e'.
+      decompose [or and] hmapstok_e;subst; decompose [or and] hmapstok_e';subst;try discriminate.
+      + assumption.
+      + rewrite <- H in H2.
+        contradiction.
+      + rewrite H in H1.
+        contradiction.
+      + eapply hmapsto;eauto.
+  Qed.
+
+  (* Instance proper_map_equiv: forall  elt elt': Type, forall {RA} {RB}, *)
+      (* Proper ((RA ==> RB) ==> (@Dico.Equiv elt RA) ==> @Dico.Equiv elt' RB) (map (elt':=elt')). *)
+  (* Proof. *)
+  (* Admitted. *)
+
+(*  Lemma map_equiv: forall (A B : Type) (ReqA:A -> A -> Prop) (ReqB:B -> B -> Prop) 
+                          (f : A -> B) (l l': Dico.t A),
+      (forall x y, ReqA x y -> ReqB (f x) (f y)) -> 
+      Dico.Equiv ReqA l l' ->
+      Dico.Equiv ReqB (Dico.map f l) (Dico.map f l').
+    Proof.
+      intros A B ReqA ReqB f l.
+      induction l using  map_induction_bis;simpl;intros.
+      - admit.
+      - admit. (* TODO lemma *)
+      - 
+      
+      unfold Equiv in *.
+      split.
+      simpl.
+*)
+  Lemma add_map_equiv: forall (A B : Type) {ReqA:relation A} {ReqB:B -> B -> Prop}
+                              {HA:Equivalence ReqA}{HB:Equivalence ReqB}
+                              (k : Dico.key) (x : A) (l: Dico.t A) (f : A -> B),
+      (Proper (ReqA ==> ReqB) f)%signature ->
+      (* (forall x y, ReqA x y -> ReqB (f x) (f y)) ->  *)
+      Dico.Equiv ReqB (Dico.map f (Dico.add k x l)) (Dico.add k (f x) (Dico.map f l)).
+    Proof.
+      intros A B ReqA ReqB HA HB k x l f Hcompat.
+      red.
+      (* Normalement il faudrait un rewrite ici. *)
+      setoid_rewrite <- add_map.
+      split;intros.
+      - reflexivity.
+      - erewrite (@F.MapsTo_fun _ _ k0 e e');eauto.
+        reflexivity.
+    Qed.
+
+
+(*  Add Parametric Morphism (elt: Type) {R:relation elt}
+      {Ha:Equivalence R} : (@Equiv elt R)
+      with signature (@Dico.Equal elt ==>@Dico.Equal elt ==> iff)
+        as equal_equiv_morph.
+  Proof.
+    intros x y hEq x0 y0 hEq0. 
+    eapply Equiv_refl_Equal with (Req:=R) in hEq.
+    - eapply Equiv_refl_Equal with (Req:=R) in hEq0.
+      + rewrite hEq.
+        rewrite hEq0.
+        reflexivity.
+      + apply Ha.
+    - apply Ha.
+  Qed.*)
+
 End MoreMaps.
 
 

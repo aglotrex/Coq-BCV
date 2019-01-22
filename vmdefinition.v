@@ -60,6 +60,9 @@ Module VMDefinition(V:VMVal)(H:Herit).
     reg_eq_C : Dico.Equal r1.(objfields) r2.(objfields)
                -> r1.(objclass) = r2.(objclass) -> obj_eq r1 r2.
 
+
+
+
   Inductive heap_eq h1 h2 : Prop :=
     heap_eq_C : Dico.Equiv obj_eq h1 h2 -> heap_eq h1 h2.
 
@@ -403,6 +406,15 @@ Ltac rename_vmdef ::= rename_vm1.
   assumption.
   Qed.
 
+  Add Parametric Morphism: Build_Obj with signature (eq ==> Dico.Equiv eq ==> obj_eq)
+                                       as build_obj_morphism.
+  Proof.
+    intros y x y0 H. 
+    constructor;auto.
+    simpl.
+    apply Dicomore.Equal_Equiv.
+    assumption.
+  Qed.
 
 
   Lemma compat_stack_refl : reflexive _ compat_stack.
@@ -569,6 +581,17 @@ Ltac rename_vmdef ::= rename_vm1.
     - transitivity (heap y); assumption.
     - transitivity (mdef (frame y)); assumption.
   Qed.
+
+  Add Parametric Morphism (elt: Type) {R:relation elt}
+      {Ha:Equivalence R} : (@Build_Obj)
+      with signature (eq ==>@Dico.Equiv _ eq ==> obj_eq)
+        as build_obj_morph.
+  Proof.
+    intros y x y0 hequiv.
+    constructor;simpl;auto.
+    apply Dicomore.Equal_Equiv;auto.
+  Qed.
+
 
   Add Parametric Relation: State compat_state
                                  reflexivity proved by compat_state_refl

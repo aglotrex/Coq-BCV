@@ -35,13 +35,14 @@ Module A (Import H:Herit).
 (** * Exécution de la machine défensive.
    Pas de vérif de overflow. pas de nb négatifs. *)
   Function exec_step (s:State): list (option State) :=
-    Definition exec_step (s:State): option State :=
     let frm:Frame := s.(frame) in
     let pc: pc_idx := frm.(pc) in
     let instr_opt := Dico.find pc (frm.(mdef).(instrs)) in
     match instr_opt with
     | None => [None]
     | Some instr =>
+      [None]
+(*
       match instr with
         | ret => [Some s]
         | Iconst i =>
@@ -225,7 +226,7 @@ Module A (Import H:Herit).
                |}]
 
         end
-      end
+      end*)
     end.
 
 
