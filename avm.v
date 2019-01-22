@@ -40,39 +40,38 @@ Module A (Import H:Herit).
     let instr_opt := Dico.find pc (frm.(mdef).(instrs)) in
     match instr_opt with
     | None => [None]
-    | Some instr =>
-      [None]
-(*
+    | Some instr => [None](*
       match instr with
         | ret => [Some s]
         | Iconst i =>
              [Some {| framestack := s.(framestack); heap := s.(heap);
                 frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                             pc:= pc + 1;
-                            stack:= DefVal.Tint i :: s.(frame).(stack)
+                            stack:= Tint :: s.(frame).(stack)
                          |}
-             |}} ]
-          
+             |} ]
+
        |Iadd =>
           match s.(frame).(stack) with
               | nil => [None]
-              | Tint i1 :: nil => None
-              | Tint i1 :: Tint i2 :: stack' => 
+              | Tint :: nil => None
+              | Tint :: Tint :: stack' => 
                 [Some {| framestack := s.(framestack); heap := s.(heap);
                         frame := {| mdef:=s.(frame).(mdef); regs:= s.(frame).(regs);
                                     pc:= pc + 1;
-                                    stack:= Tint (i1+i2) :: stack'
+                                    stack:= Tint :: stack'
                                  |}
                      |}]
               | _  => [None]
               end
+
       | Iload ridx =>
         match Dico.find ridx (s.(frame).(regs)) with
-        | Some (Tint i) =>
+        | Some Tint =>
           [Some {| framestack := s.(framestack); heap := s.(heap);
                   frame := {| mdef:=s.(frame).(mdef); regs:= s.(frame).(regs);
                               pc:= pc + 1;
-                              stack:= (Tint i) :: s.(frame).(stack)
+                              stack:= Tint :: s.(frame).(stack)
                            |}
                |}]
         | _ => [None] (** Bad register number *)
@@ -80,12 +79,12 @@ Module A (Import H:Herit).
 
       | Rload cl_exp ridx =>
           match Dico.find ridx (s.(frame).(regs)) with
-        | Some (Vref (cl_act,addr)) =>
+        | Some (Tref cl_act) =>
           if (H.sub cl_act  cl_exp ) then
           Some {| framestack := s.(framestack); heap := s.(heap);
                   frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                               pc:= pc + 1;
-                              stack:= (Vref (cl_act,addr)) :: s.(frame).(stack)
+                              stack:= (Tref cl_act) :: s.(frame).(stack)
                            |}
                |}
           else
@@ -95,10 +94,10 @@ Module A (Import H:Herit).
 
       | Istore ridx =>
         match s.(frame).(stack) with
-        | (Tint i) :: stack' =>
+        | Tint :: stack' =>
             [Some {| framestack := s.(framestack); heap := s.(heap);
                     frame := {| mdef:=s.(frame).(mdef) ;
-                                regs:= Dico.add ridx (Vint i) (s.(frame).(regs));
+                                regs:= Dico.add ridx Tint (s.(frame).(regs));
                                 pc:= pc + 1;
                                 stack:= stack'
                              |}
@@ -109,11 +108,11 @@ Module A (Import H:Herit).
 
       | Rstore cl_exp ridx =>
         match s.(frame).(stack) with
-        | (Vref (cl_act,addr)) :: stack' =>
+        | (Tref cl_act) :: stack' =>
           if (H.sub cl_act cl_exp) then
             [Some {| framestack := s.(framestack); heap := s.(heap);
                     frame := {| mdef:=s.(frame).(mdef) ;
-                                regs:= Dico.add ridx (Vref (cl_act,addr))  (s.(frame).(regs));
+                                regs:= Dico.add ridx (Tref cl_act)  (s.(frame).(regs));
                                 pc:= pc + 1;
                                 stack:= stack'
                              |}
@@ -130,15 +129,13 @@ Module A (Import H:Herit).
 
  
       match s.(frame).(stack) with
-        | (Tint 0) :: stack' => (** = 0  --> jump *)
-          [Some {| framestack := s.(framestack); heap := s.(heap);
+        | Tint :: stack' => (** = 0  --> jump *)
+          Some {| framestack := s.(framestack); heap := s.(heap);
                   frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                               pc:= jmp;
                               stack:= stack'
                            |}
-               |}]
-        | (Tint _ ):: stack' => (** <> 0  --> pc+1 *)
-          [Some {| framestack := s.(framestack); heap := s.(heap);
+               |} :: [Some {| framestack := s.(framestack); heap := s.(heap);
                   frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                               pc:= pc+1;
                               stack:= stack'
@@ -158,19 +155,18 @@ Module A (Import H:Herit).
 
       | Getfield cl namefld typ =>
         match s.(frame).(stack) with
-        | Tref (classid,hpidx) :: stack' =>
+        | Tref classid :: stack' =>
           if (H.sub classid cl) then
-          match Dico.find hpidx s.(heap) with
+          match FIND cl H.allcl with
           | None => [None] (** adresse inconnue *)
-          | Some {|objclass:= objcl; objfields:= flds |} => (* TODO: vérifier le type retourné? *)
-            if (H.sub objcl cl) then
-            match Dico.find namefld flds with
-            | None => [None] (** Champ de classe inconnu ou pas initialisé *)
-            | Some v =>
-              [Some {| framestack := s.(framestack); heap := s.(heap);
+          | Some cldef => (* TODO: vérifier le type retourné? *)
+            match FIND namefld cldef with
+            | None => [None]
+            | Some _ =>
+                [Some {| framestack := s.(framestack); heap := s.(heap);
                       frame := {| mdef:=s.(frame).(mdef) ; regs:= s.(frame).(regs);
                                   pc:= pc+1;
-                                  stack:= v :: stack'
+                                  stack:= namefld :: stack'
                                |}
                    |}]
             end
@@ -182,7 +178,7 @@ Module A (Import H:Herit).
 
       | Putfield cl namefld typ =>
         match s.(frame).(stack) with
-        | Tref (classid,hpidx) :: v :: stack' =>
+        | Tref classid :: v :: stack' =>
           if (H.sub classid cl) then
           match FIND cl H.allcl with
           | None => [None]
