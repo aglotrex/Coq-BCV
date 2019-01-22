@@ -123,6 +123,10 @@ Module Offensive_correcte (H:heritage.Herit).
 Proof.
   Admitted.
 
+Lemma eq_built : forall t:ClasseDef , Dico.map d2o (build_flds t) = O.build_flds t .
+Proof. 
+ Admitted.
+
   (** Diagramme de commutation entre D et O.*)
   Lemma offensive_ok : 
     forall (s s':D.State) (os os' os'':O.State),
@@ -253,7 +257,28 @@ Proof.
       unfold offensive_state; simpl.
       reflexivity.
 
-  +  admit.
+  + destruct_with_eqn (stack (frame s)); try now inversion H1.
+    destruct_with_eqn d; try now inversion H1.
+    destruct_with_eqn clrf. destruct l; try now inversion H1.
+    destruct_with_eqn (H.sub c cl); try now inversion H1.
+    destruct_with_eqn (FIND cl H.allcl); try now inversion H1.
+    destruct_with_eqn (FIND fldrf t); try now inversion H1.
+    destruct_with_eqn (compat (v2t d0) v); try now inversion H1.
+    destruct_with_eqn (FIND h (heap s)); try now inversion H1.
+    destruct_with_eqn o.
+    unfold offensive_state in H2. simpl in H2.
+    setoid_rewrite Heql in H2. simpl in H2.
+    unfold offensive_heap in H2.
+    rewrite Dicomore.F.map_o in H2.
+    rewrite Heqo1 in H2. simpl in H2.
+    inversion H1. inversion H2. clear H1 H2.
+    unfold offensive_state; simpl.
+    unfold offensive_heap.
+apply O.state_eq_C; try reflexivity. simpl. 
+constructor.
+rewrite Dicomore.add_map_equiv; try eauto with typeclass_instances. simpl.
+rewrite Dicomore.add_map_equiv; try eauto with typeclass_instances. simpl.
+reflexivity.
   + unfold new in H1;simpl in H1.
     
     destruct_with_eqn (FIND clid allcl ); try now inversion H1.
@@ -267,15 +292,14 @@ unfold offensive_heap in H2.
 unfold offensive_stack in H2.  simpl in H2.
  inversion H1. inversion H2. clear H1 H2.
    unfold offensive_state; simpl. unfold offensive_stack. subst.
-simpl. apply O.state_eq_C; try reflexivity. simpl. unfold offensive_heap. simpl.
-apply offensive_heap.
- rewrite Dicomore.add_map. O.frame_eq_C;try reflexivity.
- 
-   simpl. reflexivity.
-admit.
+simpl. apply O.state_eq_C; try reflexivity. simpl. unfold offensive_heap. simpl. 
+apply O.heap_eq_C. rewrite Dicomore.add_map_equiv; try eauto with typeclass_instances.
+simpl.
+rewrite eq_built. reflexivity.
   + 
    inversion H1. inversion H2. rewrite H0. reflexivity.
-Admitted.
-  
+Qed.
+
+
 
 End Offensive_correcte.
