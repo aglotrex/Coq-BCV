@@ -123,9 +123,34 @@ Module Offensive_correcte (H:heritage.Herit).
 Proof.
   Admitted.
 
-Lemma eq_built : forall t:ClasseDef , Dico.map d2o (build_flds t) = O.build_flds t .
+Lemma eq_built : forall t:ClasseDef , Dico.Equal (Dico.map d2o (build_flds t)) (O.build_flds t).
 Proof. 
- Admitted.
+  intros.
+  induction t using  Dicomore.map_induction_bis;simpl;intros.
+  - assert (Dico.Equal (build_flds t1) (build_flds t2)). {
+      unfold build_flds.
+      setoid_rewrite H.
+      reflexivity.
+    }
+   setoid_rewrite <- H0.
+   assert (Dico.Equal (O.build_flds t1) (O.build_flds t2)). {
+      unfold build_flds.
+      setoid_rewrite H.
+      reflexivity.
+    }
+   setoid_rewrite <- H1.
+    assumption.
+  - simpl. apply O.build_flds_empty.
+  - unfold build_flds.
+    unfold O.build_flds.
+    destruct e;
+      rewrite Dicomore.add_map;
+      rewrite Dicomore.add_map;
+      rewrite Dicomore.add_map;
+    simpl;
+    apply Dicomore.F.add_m;try reflexivity;assumption.
+
+ Qed.
 
   (** Diagramme de commutation entre D et O.*)
   Lemma offensive_ok : 
