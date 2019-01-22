@@ -320,7 +320,7 @@ unfold offensive_stack in H2.  simpl in H2.
 simpl. apply O.state_eq_C; try reflexivity. simpl. unfold offensive_heap. simpl. 
 apply O.heap_eq_C. rewrite Dicomore.add_map_equiv; try eauto with typeclass_instances.
 simpl.
-rewrite eq_built. reflexivity.
+rewrite eq_built.0 reflexivity.
   + 
    inversion H1. inversion H2. rewrite H0. reflexivity.
 Qed.
